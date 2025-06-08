@@ -8,9 +8,10 @@ import { Label } from "./ui/label";
 interface OpenDialogProps {
     todo: Todo | null;
     closeDialog: () => void;
+    deleteTodo: (id: string) => void;
 }
 
-export default function OpenDialog({ todo, closeDialog }: OpenDialogProps) {
+export default function OpenDialog({ todo, closeDialog, deleteTodo }: OpenDialogProps) {
 
     return (
         <Dialog open={todo !== null} onOpenChange={(open) => {
@@ -33,7 +34,14 @@ export default function OpenDialog({ todo, closeDialog }: OpenDialogProps) {
                         </div>
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
+                        <Button variant="destructive" onClick={() => {
+                            if (todo) {
+                                deleteTodo(todo.id);
+                            }
+                        }}>
+                            Delete
+                        </Button>
+                         <DialogClose asChild>
                             <Button variant="outline">Close</Button>
                         </DialogClose>
                     </DialogFooter>

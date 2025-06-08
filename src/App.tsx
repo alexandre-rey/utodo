@@ -29,9 +29,15 @@ export default function App() {
     setSelectedTodo(null);
   }
 
+  const deleteTodo = (id: string) => {
+    const updatedTodos = todos.filter(todo => todo.id !== id);
+    saveTodos(updatedTodos);
+    setTodos(updatedTodos);
+    setSelectedTodo(null);
+  }
+
   useEffect(() => {
-    const initialTodos = loadTodos();
-    setTodos(initialTodos);
+    setTodos(loadTodos());
   }, []);
 
   return (
@@ -40,7 +46,7 @@ export default function App() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-4">Todo App</h1>
         <AddDialog onAddTodo={handleAddTodo} />
-        <OpenDialog todo={selectedTodo} closeDialog={handleCloseDialog} />
+        <OpenDialog todo={selectedTodo} closeDialog={handleCloseDialog} deleteTodo={deleteTodo} />
         <DisplayTodos todos={todos} setSelectedTodo={setSelectedTodo} />
       </div>
     </>
