@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import AddDialog from "./components/AddDialog";
-import type { Todo } from "./interfaces/todo.interface";
 import { Toaster } from "./components/ui/sonner";
 import OpenDialog from "./components/OpenDialog";
 import DisplayTodos from "./components/DisplayTodos";
 import { loadTodos, saveTodos } from "./services/save";
+import type { Todo } from "./interfaces/todo.interface";
 
 
 export default function App() {
@@ -16,7 +16,7 @@ export default function App() {
       id: crypto.randomUUID(),
       title: values.title,
       description: values.description,
-      completed: false,
+      status: "PENDING",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -36,6 +36,13 @@ export default function App() {
     setSelectedTodo(null);
   }
 
+  const saveTodo = (todo: Todo) => {
+    const updatedTodos = todos.map(t => t.id === todo.id ? { ...t, ...todo, updatedAt: new Date() } : t);
+    saveTodos(updatedTodos);
+    setTodos(updatedTodos);
+    setSelectedTodo(null);
+  }
+
   useEffect(() => {
     setTodos(loadTodos());
   }, []);
@@ -46,7 +53,7 @@ export default function App() {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
         <h1 className="text-2xl font-bold mb-4">Todo App</h1>
         <AddDialog onAddTodo={handleAddTodo} />
-        <OpenDialog todo={selectedTodo} closeDialog={handleCloseDialog} deleteTodo={deleteTodo} />
+        <OpenDialog todo={selectedTodo} closeDialog={handleCloseDialog} deleteTodo={deleteTodo} saveTodo={saveTodo} />
         <DisplayTodos todos={todos} setSelectedTodo={setSelectedTodo} />
       </div>
     </>

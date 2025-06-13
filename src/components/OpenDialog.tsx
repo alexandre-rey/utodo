@@ -1,7 +1,9 @@
+import { statuses } from "../data/status";
 import type { Todo } from "../interfaces/todo.interface";
 import { Button } from "./ui/button";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Label } from "./ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 
 
@@ -9,9 +11,10 @@ interface OpenDialogProps {
     todo: Todo | null;
     closeDialog: () => void;
     deleteTodo: (id: string) => void;
+    saveTodo: (todo: Todo) => void;
 }
 
-export default function OpenDialog({ todo, closeDialog, deleteTodo }: OpenDialogProps) {
+export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo }: OpenDialogProps) {
 
     return (
         <Dialog open={todo !== null} onOpenChange={(open) => {
@@ -27,12 +30,20 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo }: OpenDialog
                             <Label>{todo?.description || "No description provided."}</Label>
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-4">
-                        <div className="grid gap-3">
-                        </div>
-                        <div className="grid gap-3">
-                        </div>
-                    </div>
+                    <Select>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {
+                                statuses.map((status) => (
+                                    <SelectItem key={status.value} value={status.value}>
+                                        {status.label}
+                                    </SelectItem>
+                                ))
+                            }
+                        </SelectContent>
+                    </Select>
                     <DialogFooter>
                         <Button variant="destructive" onClick={() => {
                             if (todo) {
@@ -41,9 +52,11 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo }: OpenDialog
                         }}>
                             Delete
                         </Button>
-                         <DialogClose asChild>
-                            <Button variant="outline">Close</Button>
-                        </DialogClose>
+                        <Button variant="default" onClick={() => {
+                            if (todo) {
+                                saveTodo(todo);
+                            }
+                        }}>Save</Button>
                     </DialogFooter>
                 </DialogContent>
             </form>
