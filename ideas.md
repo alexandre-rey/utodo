@@ -1,13 +1,13 @@
 🎯 High Impact, Simple Features:
 
-  1. Due Dates & Calendar View
+  1. Due Dates & Calendar View - DONE
 
   - Add optional due date to todos
   - Simple calendar picker in edit dialog
   - Visual indicators for overdue/due soon
   - Optional: simple calendar view alongside kanban
 
-  2. Search & Filtering
+  2. Search & Filtering - DONE
 
   - Search bar to find todos by title/description
   - Filter by status, completion, or due date
@@ -25,7 +25,7 @@
   - Archive completed todos after X days (auto-cleanup)
   - Import/export todos (simple JSON backup)
 
-  5. Visual Enhancements
+  5. Visual Enhancements - DONE
 
   - Dark mode toggle
   - Todo icons/emojis (simple picker)

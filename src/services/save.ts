@@ -33,7 +33,14 @@ export const saveTodos = (todos: Todo[]) => {
 
 export const loadTodos = (): Todo[] => {
     try {
-        return JSON.parse(localStorage.getItem(TODOS_KEY) || "[]");
+        const todos = JSON.parse(localStorage.getItem(TODOS_KEY) || "[]");
+        // Convert date strings back to Date objects
+        return todos.map((todo: any) => ({
+            ...todo,
+            createdAt: new Date(todo.createdAt),
+            updatedAt: new Date(todo.updatedAt),
+            dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined
+        }));
     } catch (error) {
         console.error("Failed to load todos from localStorage:", error);
         return [];

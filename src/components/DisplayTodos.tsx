@@ -108,18 +108,20 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
         return (
             <div 
                 key={status.id} 
-                className="flex-1 min-w-80"
+                className="flex-1 min-w-80 flex-shrink-0"
                 onDragOver={handleDragOver}
                 onDragEnter={() => handleDragEnter(status.id)}
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, status.id)}
             >
-                <h3 className="text-lg font-semibold mb-4 text-center p-2 rounded-t-lg" style={{backgroundColor: status.color}}>
-                    {status.label}
-                </h3>
-                <div className={`flex flex-col gap-4 min-h-96 p-2 rounded-b-lg transition-colors ${
-                    isDropTarget ? 'bg-blue-100 border-2 border-blue-300 border-dashed' : 'bg-gray-50'
-                }`}>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl shadow-sm border-0 overflow-hidden">
+                    <h3 className="text-lg font-semibold mb-0 text-center p-4 text-white shadow-sm" style={{backgroundColor: status.color}}>
+                        {status.label}
+                        <span className="ml-2 text-sm font-normal opacity-80">({statusTodos.length})</span>
+                    </h3>
+                    <div className={`flex flex-col gap-3 min-h-96 p-4 transition-all duration-200 ${
+                        isDropTarget ? 'bg-blue-50 border-2 border-blue-200 border-dashed' : 'bg-transparent'
+                    }`}>
                     {statusTodos.map((todo) => {
                         const dueDateStatus = getDueDateStatus(todo.dueDate);
                         const isOverdue = dueDateStatus === 'overdue';
@@ -128,32 +130,31 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
                         return (
                             <Card 
                                 key={todo.id} 
-                                className={`p-4 cursor-grab hover:bg-gray-100 transition-opacity relative ${
-                                    draggedTodo === todo.id ? 'opacity-50 cursor-grabbing' : ''
-                                } ${todo.completed ? 'opacity-60 bg-green-50' : ''} ${
-                                    isOverdue && !todo.completed ? 'border-l-4 border-l-red-500 bg-red-50' : ''
-                                } ${isDueSoon && !todo.completed ? 'border-l-4 border-l-orange-500 bg-orange-50' : ''}`}
+                                className={`p-4 cursor-grab hover:shadow-md hover:scale-[1.02] transition-all duration-200 relative bg-white border-0 shadow-sm ${
+                                    draggedTodo === todo.id ? 'opacity-50 cursor-grabbing scale-95' : ''
+                                } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : ''} ${
+                                    isOverdue && !todo.completed ? 'border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-pink-50' : ''
+                                } ${isDueSoon && !todo.completed ? 'border-l-4 border-l-orange-500 bg-gradient-to-r from-orange-50 to-amber-50' : ''}`}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, todo.id)}
                                 onDragEnd={handleDragEnd}
                                 onClick={() => {
-                                    // Only open dialog if not dragging
                                     if (!draggedTodo) {
                                         setSelectedTodo(todo);
                                     }
                                 }}
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h2 className={`text-lg font-semibold ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+                                            <h2 className={`text-lg font-semibold truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                                 {todo.title}
                                             </h2>
                                             {isOverdue && !todo.completed && (
-                                                <AlertTriangle className="h-4 w-4 text-red-500" />
+                                                <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
                                             )}
                                         </div>
-                                        <p className={`text-sm text-gray-600 h-16 overflow-clip mb-2 ${todo.completed ? 'line-through' : ''}`}>
+                                        <p className={`text-sm text-gray-600 h-16 overflow-hidden text-ellipsis mb-2 leading-relaxed ${todo.completed ? 'line-through' : ''}`}>
                                             {todo.description || "No description provided."}
                                         </p>
                                         {todo.dueDate && (
@@ -170,7 +171,9 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
                                     <Button
                                         variant={todo.completed ? "default" : "outline"}
                                         size="sm"
-                                        className={`ml-2 ${todo.completed ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                                        className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                            todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                        }`}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onTodoCompletionToggle(todo.id);
@@ -182,11 +185,12 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
                             </Card>
                         );
                     })}
-                    {statusTodos.length === 0 && isDropTarget && (
-                        <div className="text-center text-gray-400 py-8">
-                            Drop todo here
-                        </div>
-                    )}
+                        {statusTodos.length === 0 && isDropTarget && (
+                            <div className="text-center text-slate-400 py-8 text-sm">
+                                Drop todo here
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         );
@@ -196,11 +200,10 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
     const visibleStatuses = statuses;
 
     return (
-        <div className="w-full mx-auto p-4" style={{ maxWidth: `${visibleStatuses.length * 22}rem` }}>
-            <div className="flex gap-6 overflow-x-auto">
+        <div className="w-full mx-auto px-6 pb-8" style={{ maxWidth: `${visibleStatuses.length * 22}rem` }}>
+            <div className="flex gap-6 overflow-x-auto pb-4">
                 {visibleStatuses.map(status => renderColumn(status))}
             </div>
         </div>
-    )
-
+    );
 }

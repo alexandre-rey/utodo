@@ -73,8 +73,8 @@ export default function CalendarView({
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4">
-            <div className="space-y-6">
+        <div className="w-full max-w-4xl mx-auto px-6 pb-8">
+            <div className="space-y-8">
                 {/* Overdue Section */}
                 {sortedDates.some(date => isOverdue(date) && todosByDate[date].some(todo => !todo.completed)) && (
                     <div>
@@ -89,12 +89,12 @@ export default function CalendarView({
                                 .map(todo => (
                                     <Card 
                                         key={todo.id} 
-                                        className="p-3 cursor-pointer hover:bg-gray-100 border-l-4 border-l-red-500 bg-red-50"
+                                        className="p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-pink-50 border-0 shadow-sm"
                                         onClick={() => setSelectedTodo(todo)}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <h4 className="font-medium">{todo.title}</h4>
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium truncate">{todo.title}</h4>
                                                 <p className="text-sm text-gray-600 truncate">
                                                     {todo.description || "No description"}
                                                 </p>
@@ -105,6 +105,7 @@ export default function CalendarView({
                                             <Button
                                                 variant="outline"
                                                 size="sm"
+                                                className="flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md hover:bg-slate-100"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     onTodoCompletionToggle(todo.id);
@@ -132,14 +133,14 @@ export default function CalendarView({
                                 {todosByDate[date].map(todo => (
                                     <Card 
                                         key={todo.id} 
-                                        className={`p-3 cursor-pointer hover:bg-gray-100 ${
-                                            todo.completed ? 'opacity-60 bg-green-50' : ''
+                                        className={`p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-0 shadow-sm ${
+                                            todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'
                                         }`}
                                         onClick={() => setSelectedTodo(todo)}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex-1">
-                                                <h4 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+                                        <div className="flex items-center justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className={`font-medium truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                                     {todo.title}
                                                 </h4>
                                                 <p className={`text-sm text-gray-600 truncate ${todo.completed ? 'line-through' : ''}`}>
@@ -149,7 +150,9 @@ export default function CalendarView({
                                             <Button
                                                 variant={todo.completed ? "default" : "outline"}
                                                 size="sm"
-                                                className={todo.completed ? 'bg-green-500 hover:bg-green-600' : ''}
+                                                className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                                    todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                                }`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     onTodoCompletionToggle(todo.id);
@@ -174,14 +177,14 @@ export default function CalendarView({
                             {todosByDate['no-date'].map(todo => (
                                 <Card 
                                     key={todo.id} 
-                                    className={`p-3 cursor-pointer hover:bg-gray-100 ${
-                                        todo.completed ? 'opacity-60 bg-green-50' : ''
+                                    className={`p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-0 shadow-sm ${
+                                        todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'
                                     }`}
                                     onClick={() => setSelectedTodo(todo)}
                                 >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex-1">
-                                            <h4 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : ''}`}>
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={`font-medium truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                                 {todo.title}
                                             </h4>
                                             <p className={`text-sm text-gray-600 truncate ${todo.completed ? 'line-through' : ''}`}>
@@ -191,7 +194,9 @@ export default function CalendarView({
                                         <Button
                                             variant={todo.completed ? "default" : "outline"}
                                             size="sm"
-                                            className={todo.completed ? 'bg-green-500 hover:bg-green-600' : ''}
+                                            className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                                todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                            }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onTodoCompletionToggle(todo.id);
