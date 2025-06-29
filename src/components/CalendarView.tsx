@@ -1,7 +1,7 @@
 import type { Todo } from "../interfaces/todo.interface";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Check, Calendar } from "lucide-react";
+import { Check, Calendar, Square, CheckSquare } from "lucide-react";
 
 interface CalendarViewProps {
     todos: Todo[];
@@ -9,6 +9,10 @@ interface CalendarViewProps {
     onTodoCompletionToggle: (todoId: string) => void;
     showCompleted: boolean;
     searchQuery: string;
+    isSelectionMode: boolean;
+    selectedTodos: Set<string>;
+    onTodoSelection: (todoId: string, isSelected: boolean) => void;
+    onEnterSelectionMode: () => void;
 }
 
 export default function CalendarView({ 
@@ -16,7 +20,11 @@ export default function CalendarView({
     setSelectedTodo, 
     onTodoCompletionToggle, 
     showCompleted, 
-    searchQuery 
+    searchQuery,
+    isSelectionMode,
+    selectedTodos,
+    onTodoSelection,
+    onEnterSelectionMode
 }: CalendarViewProps) {
     // Filter todos based on search and completion
     const filteredTodos = todos.filter(todo => {
@@ -89,10 +97,38 @@ export default function CalendarView({
                                 .map(todo => (
                                     <Card 
                                         key={todo.id} 
-                                        className="p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-pink-50 border-0 shadow-sm"
-                                        onClick={() => setSelectedTodo(todo)}
+                                        className={`p-4 transition-all duration-200 border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-pink-50 border-0 shadow-sm ${
+                                            isSelectionMode 
+                                                ? `cursor-pointer ${selectedTodos.has(todo.id) ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`
+                                                : 'cursor-pointer hover:shadow-md hover:scale-[1.01]'
+                                        }`}
+                                        onClick={() => {
+                                            if (isSelectionMode) {
+                                                onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                            } else {
+                                                setSelectedTodo(todo);
+                                            }
+                                        }}
+                                        onContextMenu={(e) => {
+                                            if (!isSelectionMode) {
+                                                e.preventDefault();
+                                                onEnterSelectionMode();
+                                                onTodoSelection(todo.id, true);
+                                            }
+                                        }}
                                     >
                                         <div className="flex items-center justify-between gap-3">
+                                            {/* Selection Checkbox */}
+                                            {isSelectionMode && (
+                                                <div>
+                                                    {selectedTodos.has(todo.id) ? (
+                                                        <CheckSquare className="h-5 w-5 text-blue-600" />
+                                                    ) : (
+                                                        <Square className="h-5 w-5 text-slate-400" />
+                                                    )}
+                                                </div>
+                                            )}
+                                            
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-medium truncate">{todo.title}</h4>
                                                 <p className="text-sm text-gray-600 truncate">
@@ -102,17 +138,19 @@ export default function CalendarView({
                                                     Due: {new Date(todo.dueDate!).toLocaleDateString()}
                                                 </p>
                                             </div>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md hover:bg-slate-100"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onTodoCompletionToggle(todo.id);
-                                                }}
-                                            >
-                                                <Check className="h-4 w-4" />
-                                            </Button>
+                                            {!isSelectionMode && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md hover:bg-slate-100"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onTodoCompletionToggle(todo.id);
+                                                    }}
+                                                >
+                                                    <Check className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </Card>
                                 ))}
@@ -133,12 +171,38 @@ export default function CalendarView({
                                 {todosByDate[date].map(todo => (
                                     <Card 
                                         key={todo.id} 
-                                        className={`p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-0 shadow-sm ${
-                                            todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'
-                                        }`}
-                                        onClick={() => setSelectedTodo(todo)}
+                                        className={`p-4 transition-all duration-200 border-0 shadow-sm ${
+                                            isSelectionMode 
+                                                ? `cursor-pointer ${selectedTodos.has(todo.id) ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`
+                                                : 'cursor-pointer hover:shadow-md hover:scale-[1.01]'
+                                        } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'}`}
+                                        onClick={() => {
+                                            if (isSelectionMode) {
+                                                onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                            } else {
+                                                setSelectedTodo(todo);
+                                            }
+                                        }}
+                                        onContextMenu={(e) => {
+                                            if (!isSelectionMode) {
+                                                e.preventDefault();
+                                                onEnterSelectionMode();
+                                                onTodoSelection(todo.id, true);
+                                            }
+                                        }}
                                     >
                                         <div className="flex items-center justify-between gap-3">
+                                            {/* Selection Checkbox */}
+                                            {isSelectionMode && (
+                                                <div>
+                                                    {selectedTodos.has(todo.id) ? (
+                                                        <CheckSquare className="h-5 w-5 text-blue-600" />
+                                                    ) : (
+                                                        <Square className="h-5 w-5 text-slate-400" />
+                                                    )}
+                                                </div>
+                                            )}
+                                            
                                             <div className="flex-1 min-w-0">
                                                 <h4 className={`font-medium truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                                     {todo.title}
@@ -147,19 +211,21 @@ export default function CalendarView({
                                                     {todo.description || "No description"}
                                                 </p>
                                             </div>
-                                            <Button
-                                                variant={todo.completed ? "default" : "outline"}
-                                                size="sm"
-                                                className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
-                                                    todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
-                                                }`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    onTodoCompletionToggle(todo.id);
-                                                }}
-                                            >
-                                                <Check className="h-4 w-4" />
-                                            </Button>
+                                            {!isSelectionMode && (
+                                                <Button
+                                                    variant={todo.completed ? "default" : "outline"}
+                                                    size="sm"
+                                                    className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                                        todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                                    }`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        onTodoCompletionToggle(todo.id);
+                                                    }}
+                                                >
+                                                    <Check className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </Card>
                                 ))}
@@ -177,12 +243,38 @@ export default function CalendarView({
                             {todosByDate['no-date'].map(todo => (
                                 <Card 
                                     key={todo.id} 
-                                    className={`p-4 cursor-pointer hover:shadow-md hover:scale-[1.01] transition-all duration-200 border-0 shadow-sm ${
-                                        todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'
-                                    }`}
-                                    onClick={() => setSelectedTodo(todo)}
+                                    className={`p-4 transition-all duration-200 border-0 shadow-sm ${
+                                        isSelectionMode 
+                                            ? `cursor-pointer ${selectedTodos.has(todo.id) ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`
+                                            : 'cursor-pointer hover:shadow-md hover:scale-[1.01]'
+                                    } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'}`}
+                                    onClick={() => {
+                                        if (isSelectionMode) {
+                                            onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                        } else {
+                                            setSelectedTodo(todo);
+                                        }
+                                    }}
+                                    onContextMenu={(e) => {
+                                        if (!isSelectionMode) {
+                                            e.preventDefault();
+                                            onEnterSelectionMode();
+                                            onTodoSelection(todo.id, true);
+                                        }
+                                    }}
                                 >
                                     <div className="flex items-center justify-between gap-3">
+                                        {/* Selection Checkbox */}
+                                        {isSelectionMode && (
+                                            <div>
+                                                {selectedTodos.has(todo.id) ? (
+                                                    <CheckSquare className="h-5 w-5 text-blue-600" />
+                                                ) : (
+                                                    <Square className="h-5 w-5 text-slate-400" />
+                                                )}
+                                            </div>
+                                        )}
+                                        
                                         <div className="flex-1 min-w-0">
                                             <h4 className={`font-medium truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                                                 {todo.title}
@@ -191,19 +283,21 @@ export default function CalendarView({
                                                 {todo.description || "No description"}
                                             </p>
                                         </div>
-                                        <Button
-                                            variant={todo.completed ? "default" : "outline"}
-                                            size="sm"
-                                            className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
-                                                todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
-                                            }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onTodoCompletionToggle(todo.id);
-                                            }}
-                                        >
-                                            <Check className="h-4 w-4" />
-                                        </Button>
+                                        {!isSelectionMode && (
+                                            <Button
+                                                variant={todo.completed ? "default" : "outline"}
+                                                size="sm"
+                                                className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                                    todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                                }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onTodoCompletionToggle(todo.id);
+                                                }}
+                                            >
+                                                <Check className="h-4 w-4" />
+                                            </Button>
+                                        )}
                                     </div>
                                 </Card>
                             ))}

@@ -7,6 +7,7 @@ import DisplayTodos from "./components/DisplayTodos";
 import CalendarView from "./components/CalendarView";
 import SettingsPanel from "./components/SettingsPanel";
 import AuthPanel from "./components/AuthPanel";
+import BulkActionsToolbar from "./components/BulkActionsToolbar";
 import { loadTodos, saveTodos, loadSettings, saveSettings, type AppSettings } from "./services/save";
 import { Settings, Eye, EyeOff, Search, Calendar, Columns, User, LogOut } from "lucide-react";
 import { Button } from "./components/ui/button";
@@ -22,6 +23,8 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<'kanban' | 'calendar'>('kanban');
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+  const [selectedTodos, setSelectedTodos] = useState<Set<string>>(new Set());
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [settings, setSettings] = useState<AppSettings>({
     statuses: [
       { id: "low", label: "Low Priority", color: "#e5e7eb" },
@@ -100,8 +103,85 @@ export default function App() {
     // TODO: In the future, clear synced data and keep only local data
   };
 
+  const handleTodoSelection = (todoId: string, isSelected: boolean) => {
+    const newSelected = new Set(selectedTodos);
+    if (isSelected) {
+      newSelected.add(todoId);
+    } else {
+      newSelected.delete(todoId);
+    }
+    setSelectedTodos(newSelected);
+    
+    // Exit selection mode if no todos are selected
+    if (newSelected.size === 0) {
+      setIsSelectionMode(false);
+    }
+  };
+
+  const handleSelectAll = () => {
+    const visibleTodos = todos.filter(todo => {
+      const shouldShow = showCompleted || !todo.completed;
+      const matchesSearch = searchQuery === "" || 
+        todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (todo.description && todo.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      return shouldShow && matchesSearch;
+    });
+    
+    const allSelected = visibleTodos.every(todo => selectedTodos.has(todo.id));
+    
+    if (allSelected) {
+      setSelectedTodos(new Set());
+      setIsSelectionMode(false);
+    } else {
+      setSelectedTodos(new Set(visibleTodos.map(todo => todo.id)));
+      setIsSelectionMode(true);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    const updatedTodos = todos.filter(todo => !selectedTodos.has(todo.id));
+    saveTodos(updatedTodos);
+    setTodos(updatedTodos);
+    setSelectedTodos(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const handleBulkComplete = () => {
+    const updatedTodos = todos.map(todo => 
+      selectedTodos.has(todo.id) 
+        ? { ...todo, completed: true, updatedAt: new Date() }
+        : todo
+    );
+    saveTodos(updatedTodos);
+    setTodos(updatedTodos);
+    setSelectedTodos(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const handleBulkStatusChange = (newStatus: string) => {
+    const updatedTodos = todos.map(todo => 
+      selectedTodos.has(todo.id) 
+        ? { ...todo, status: newStatus, updatedAt: new Date() }
+        : todo
+    );
+    saveTodos(updatedTodos);
+    setTodos(updatedTodos);
+    setSelectedTodos(new Set());
+    setIsSelectionMode(false);
+  };
+
   // Count completed todos for display
   const completedCount = todos.filter(todo => todo.completed).length;
+
+  // Calculate bulk selection state
+  const visibleTodos = todos.filter(todo => {
+    const shouldShow = showCompleted || !todo.completed;
+    const matchesSearch = searchQuery === "" || 
+      todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (todo.description && todo.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return shouldShow && matchesSearch;
+  });
+  const allVisibleSelected = visibleTodos.length > 0 && visibleTodos.every(todo => selectedTodos.has(todo.id));
 
   useEffect(() => {
     setTodos(loadTodos());
@@ -113,17 +193,67 @@ export default function App() {
       // Ctrl+K or Cmd+K to focus search
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
-        const searchInput = document.querySelector('input[placeholder="Search todos..."]') as HTMLInputElement;
+        const searchInput = document.querySelector('input[placeholder*="Search todos"]') as HTMLInputElement;
         if (searchInput) {
           searchInput.focus();
           searchInput.select();
         }
       }
+      
+      // Ctrl+N or Cmd+N to focus new todo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        const addInput = document.querySelector('input[placeholder*="What needs to be done"]') as HTMLInputElement;
+        if (addInput) {
+          addInput.focus();
+        }
+      }
+      
+      // Ctrl+Shift+V or Cmd+Shift+V to toggle view mode
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'V') {
+        e.preventDefault();
+        setViewMode(viewMode === 'kanban' ? 'calendar' : 'kanban');
+      }
+      
+      // Ctrl+Shift+C or Cmd+Shift+C to toggle completed todos
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        setShowCompleted(!showCompleted);
+      }
+      
+      // Ctrl+, or Cmd+, to open settings
+      if ((e.ctrlKey || e.metaKey) && e.key === ',') {
+        e.preventDefault();
+        setIsSettingsOpen(true);
+      }
+      
+      // Escape to clear search or exit selection mode
+      if (e.key === 'Escape') {
+        if (searchQuery) {
+          setSearchQuery('');
+        } else if (isSelectionMode) {
+          setSelectedTodos(new Set());
+          setIsSelectionMode(false);
+        }
+      }
+      
+      // Ctrl+A or Cmd+A to select all visible todos
+      if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+        e.preventDefault();
+        setIsSelectionMode(true);
+        handleSelectAll();
+      }
+      
+      // Delete key to delete selected todos
+      if (e.key === 'Delete' && selectedTodos.size > 0) {
+        e.preventDefault();
+        handleBulkDelete();
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [searchQuery, viewMode, showCompleted, isSelectionMode, selectedTodos]);
 
   return (
     <>
@@ -260,6 +390,10 @@ export default function App() {
             onTodoCompletionToggle={handleTodoCompletionToggle}
             showCompleted={showCompleted}
             searchQuery={searchQuery}
+            isSelectionMode={isSelectionMode}
+            selectedTodos={selectedTodos}
+            onTodoSelection={handleTodoSelection}
+            onEnterSelectionMode={() => setIsSelectionMode(true)}
           />
         ) : (
           <CalendarView
@@ -268,8 +402,27 @@ export default function App() {
             onTodoCompletionToggle={handleTodoCompletionToggle}
             showCompleted={showCompleted}
             searchQuery={searchQuery}
+            isSelectionMode={isSelectionMode}
+            selectedTodos={selectedTodos}
+            onTodoSelection={handleTodoSelection}
+            onEnterSelectionMode={() => setIsSelectionMode(true)}
           />
         )}
+        
+        {/* Bulk Actions Toolbar */}
+        <BulkActionsToolbar
+          selectedCount={selectedTodos.size}
+          onSelectAll={handleSelectAll}
+          onClearSelection={() => {
+            setSelectedTodos(new Set());
+            setIsSelectionMode(false);
+          }}
+          onBulkDelete={handleBulkDelete}
+          onBulkComplete={handleBulkComplete}
+          onBulkStatusChange={handleBulkStatusChange}
+          statuses={settings.statuses}
+          allSelected={allVisibleSelected}
+        />
       </div>
     </>
   )

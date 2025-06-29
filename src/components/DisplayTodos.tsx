@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import type { StatusConfig } from "../services/save";
 import { useState } from "react";
-import { Check, Calendar, AlertTriangle } from "lucide-react";
+import { Check, Calendar, AlertTriangle, Square, CheckSquare } from "lucide-react";
 
 interface DisplayTodosProps {
     todos: Todo[];
@@ -13,9 +13,25 @@ interface DisplayTodosProps {
     onTodoCompletionToggle: (todoId: string) => void;
     showCompleted: boolean;
     searchQuery: string;
+    isSelectionMode: boolean;
+    selectedTodos: Set<string>;
+    onTodoSelection: (todoId: string, isSelected: boolean) => void;
+    onEnterSelectionMode: () => void;
 }
 
-export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoStatusChange, onTodoCompletionToggle, showCompleted, searchQuery }: DisplayTodosProps) {
+export default function DisplayTodos({ 
+    todos, 
+    setSelectedTodo, 
+    statuses, 
+    onTodoStatusChange, 
+    onTodoCompletionToggle, 
+    showCompleted, 
+    searchQuery, 
+    isSelectionMode, 
+    selectedTodos, 
+    onTodoSelection, 
+    onEnterSelectionMode 
+}: DisplayTodosProps) {
     const [draggedTodo, setDraggedTodo] = useState<string | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
@@ -130,21 +146,43 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
                         return (
                             <Card 
                                 key={todo.id} 
-                                className={`p-4 cursor-grab hover:shadow-md hover:scale-[1.02] transition-all duration-200 relative bg-white border-0 shadow-sm ${
-                                    draggedTodo === todo.id ? 'opacity-50 cursor-grabbing scale-95' : ''
+                                className={`p-4 transition-all duration-200 relative bg-white border-0 shadow-sm ${
+                                    isSelectionMode 
+                                        ? `cursor-pointer ${selectedTodos.has(todo.id) ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:bg-slate-50'}`
+                                        : `cursor-grab hover:shadow-md hover:scale-[1.02] ${draggedTodo === todo.id ? 'opacity-50 cursor-grabbing scale-95' : ''}`
                                 } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : ''} ${
                                     isOverdue && !todo.completed ? 'border-l-4 border-l-red-500 bg-gradient-to-r from-red-50 to-pink-50' : ''
                                 } ${isDueSoon && !todo.completed ? 'border-l-4 border-l-orange-500 bg-gradient-to-r from-orange-50 to-amber-50' : ''}`}
-                                draggable
-                                onDragStart={(e) => handleDragStart(e, todo.id)}
-                                onDragEnd={handleDragEnd}
+                                draggable={!isSelectionMode}
+                                onDragStart={!isSelectionMode ? (e) => handleDragStart(e, todo.id) : undefined}
+                                onDragEnd={!isSelectionMode ? handleDragEnd : undefined}
                                 onClick={() => {
-                                    if (!draggedTodo) {
+                                    if (isSelectionMode) {
+                                        onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                    } else if (!draggedTodo) {
                                         setSelectedTodo(todo);
+                                    }
+                                }}
+                                onContextMenu={(e) => {
+                                    if (!isSelectionMode) {
+                                        e.preventDefault();
+                                        onEnterSelectionMode();
+                                        onTodoSelection(todo.id, true);
                                     }
                                 }}
                             >
                                 <div className="flex items-start justify-between gap-3">
+                                    {/* Selection Checkbox */}
+                                    {isSelectionMode && (
+                                        <div className="mt-1">
+                                            {selectedTodos.has(todo.id) ? (
+                                                <CheckSquare className="h-5 w-5 text-blue-600" />
+                                            ) : (
+                                                <Square className="h-5 w-5 text-slate-400" />
+                                            )}
+                                        </div>
+                                    )}
+                                    
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <h2 className={`text-lg font-semibold truncate ${todo.completed ? 'line-through text-gray-500' : ''}`}>
@@ -168,19 +206,21 @@ export default function DisplayTodos({ todos, setSelectedTodo, statuses, onTodoS
                                             </div>
                                         )}
                                     </div>
-                                    <Button
-                                        variant={todo.completed ? "default" : "outline"}
-                                        size="sm"
-                                        className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
-                                            todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
-                                        }`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onTodoCompletionToggle(todo.id);
-                                        }}
-                                    >
-                                        <Check className="h-4 w-4" />
-                                    </Button>
+                                    {!isSelectionMode && (
+                                        <Button
+                                            variant={todo.completed ? "default" : "outline"}
+                                            size="sm"
+                                            className={`flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md ${
+                                                todo.completed ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : 'hover:bg-slate-100'
+                                            }`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onTodoCompletionToggle(todo.id);
+                                            }}
+                                        >
+                                            <Check className="h-4 w-4" />
+                                        </Button>
+                                    )}
                                 </div>
                             </Card>
                         );
