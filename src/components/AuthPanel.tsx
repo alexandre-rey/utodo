@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { sanitizeInput, sanitizeEmail, validatePassword } from "@/utils/sanitize";
 
 interface AuthPanelProps {
     isOpen: boolean;
@@ -28,11 +29,17 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
         e.preventDefault();
 
         try {
+            // Sanitize and validate inputs
+            const sanitizedEmail = sanitizeEmail(formData.email);
+            const validatedPassword = validatePassword(formData.password);
+            const sanitizedFirstName = sanitizeInput(formData.firstName);
+            const sanitizedLastName = sanitizeInput(formData.lastName);
+
             if (isSignIn) {
                 // Sign In
                 await login({
-                    email: formData.email,
-                    password: formData.password
+                    email: sanitizedEmail,
+                    password: validatedPassword
                 });
                 toast.success("Welcome back!");
             } else {
@@ -43,10 +50,10 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                 }
                 
                 await register({
-                    email: formData.email,
-                    password: formData.password,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName
+                    email: sanitizedEmail,
+                    password: validatedPassword,
+                    firstName: sanitizedFirstName,
+                    lastName: sanitizedLastName
                 });
                 toast.success("Account created successfully!");
             }

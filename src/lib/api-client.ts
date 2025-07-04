@@ -1,4 +1,5 @@
 import { type ApiError } from '@/types/api';
+import { CookieAuth, CSRFProtection } from '@/utils/cookieAuth';
 
 class ApiClient {
   private baseURL: string;
@@ -6,19 +7,63 @@ class ApiClient {
   private refreshToken: string | null = null;
   private refreshPromise: Promise<void> | null = null;
 
-  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://localhost:3000') {
-    this.baseURL = baseURL;
+  constructor(baseURL?: string) {
+    // Determine the appropriate API URL based on environment
+    const isDevelopment = import.meta.env.VITE_ENV === 'development' || 
+                         window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1';
+    
+    if (baseURL) {
+      this.baseURL = baseURL;
+    } else if (isDevelopment) {
+      this.baseURL = import.meta.env.VITE_API_URL_DEV || 'http://localhost:3000';
+    } else {
+      this.baseURL = import.meta.env.VITE_API_URL || 'https://api.todo-app.com';
+    }
+    
+    // Enforce HTTPS in production
+    this.enforceHTTPS();
     this.loadTokensFromStorage();
+  }
+
+  private enforceHTTPS(): void {
+    const enforceHTTPS = import.meta.env.VITE_ENFORCE_HTTPS === 'true';
+    const isProduction = import.meta.env.VITE_ENV === 'production';
+    const isDevelopment = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1';
+    
+    // Enforce HTTPS in production or when explicitly enabled
+    if ((isProduction || enforceHTTPS) && !isDevelopment) {
+      // Redirect to HTTPS if currently on HTTP
+      if (window.location.protocol === 'http:') {
+        console.warn('Redirecting to HTTPS for security');
+        window.location.href = window.location.href.replace('http:', 'https:');
+        return;
+      }
+      
+      // Ensure API URL uses HTTPS
+      if (this.baseURL.startsWith('http://')) {
+        this.baseURL = this.baseURL.replace('http://', 'https://');
+      }
+    }
   }
 
   private loadTokensFromStorage() {
     if (typeof window !== 'undefined') {
+      // Migration: Move existing tokens from localStorage
+      CookieAuth.migrateTokensFromStorage();
+      
+      // For backward compatibility during transition
       this.accessToken = localStorage.getItem('access_token');
       this.refreshToken = localStorage.getItem('refresh_token');
     }
   }
 
   private saveTokensToStorage(accessToken: string, refreshToken: string) {
+    // In a secure implementation, tokens would be set as httpOnly cookies by the server
+    // For now, we use localStorage but log a security warning
+    console.warn('Security Warning: Tokens should be stored in httpOnly cookies by the server');
+    
     if (typeof window !== 'undefined') {
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh_token', refreshToken);
@@ -28,10 +73,8 @@ class ApiClient {
   }
 
   private clearTokensFromStorage() {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-    }
+    // Clear both cookie and localStorage tokens
+    CookieAuth.clearAuth();
     this.accessToken = null;
     this.refreshToken = null;
   }
@@ -69,6 +112,9 @@ class ApiClient {
       ...options.headers,
     };
 
+    // Add CSRF protection for cookie-based auth
+    headers = CSRFProtection.addToHeaders(headers as Record<string, string>);
+
     if (this.accessToken) {
       headers = {
         ...headers,
@@ -79,6 +125,7 @@ class ApiClient {
     let response = await fetch(url, {
       ...options,
       headers,
+      credentials: 'include', // Include httpOnly cookies in requests
     });
 
     if (response.status === 401 && this.refreshToken && endpoint !== '/auth/refresh') {
@@ -99,6 +146,7 @@ class ApiClient {
       response = await fetch(url, {
         ...options,
         headers,
+        credentials: 'include', // Include httpOnly cookies in requests
       });
     }
 
@@ -170,7 +218,8 @@ class ApiClient {
   }
 
   public isAuthenticated(): boolean {
-    return !!this.accessToken;
+    // Check both localStorage (for backward compatibility) and cookie-based auth
+    return !!this.accessToken || CookieAuth.isAuthenticated();
   }
 }
 

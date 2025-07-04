@@ -3,6 +3,8 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { PlusCircle } from "lucide-react";
+import { sanitizeTodoContent } from "@/utils/sanitize";
+import { toast } from "sonner";
 
 interface QuickAddProps {
     onAddTodo: (values: { title: string; description: string }) => void;
@@ -15,11 +17,20 @@ export default function QuickAdd({ onAddTodo }: QuickAddProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (title.trim()) {
-            onAddTodo({ title: title.trim(), description: description.trim() });
-            setTitle("");
-            setDescription("");
-            setIsExpanded(false);
+        
+        try {
+            const sanitizedTitle = sanitizeTodoContent(title);
+            const sanitizedDescription = sanitizeTodoContent(description);
+            
+            if (sanitizedTitle) {
+                onAddTodo({ title: sanitizedTitle, description: sanitizedDescription });
+                setTitle("");
+                setDescription("");
+                setIsExpanded(false);
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Invalid input";
+            toast.error(message);
         }
     };
 

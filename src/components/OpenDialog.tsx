@@ -8,6 +8,8 @@ import { Card } from "./ui/card";
 import { useState, useEffect } from "react";
 import type { StatusConfig } from "../services/save";
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
+import { sanitizeTodoContent } from "@/utils/sanitize";
+import { toast } from "sonner";
 
 
 
@@ -38,15 +40,28 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
 
     const handleSave = () => {
         if (todo) {
-            const updatedTodo = {
-                ...todo,
-                title,
-                description,
-                status,
-                dueDate: dueDate ? new Date(dueDate) : undefined
-            };
-            saveTodo(updatedTodo);
-            setIsEditing(false); // Return to view mode after saving
+            try {
+                const sanitizedTitle = sanitizeTodoContent(title);
+                const sanitizedDescription = sanitizeTodoContent(description);
+                
+                if (!sanitizedTitle) {
+                    toast.error("Title is required");
+                    return;
+                }
+                
+                const updatedTodo = {
+                    ...todo,
+                    title: sanitizedTitle,
+                    description: sanitizedDescription,
+                    status,
+                    dueDate: dueDate ? new Date(dueDate) : undefined
+                };
+                saveTodo(updatedTodo);
+                setIsEditing(false); // Return to view mode after saving
+            } catch (error) {
+                const message = error instanceof Error ? error.message : "Invalid input";
+                toast.error(message);
+            }
         }
     };
 
