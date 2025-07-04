@@ -1,0 +1,931 @@
+components:
+  schemas:
+    BulkActionDto:
+      properties:
+        action:
+          description: Action to perform on the selected todos
+          enum:
+          - delete
+          - complete
+          - incomplete
+          - changeStatus
+          example: complete
+          type: string
+        newStatus:
+          description: New status (required when action is "changeStatus")
+          example: in-progress
+          type: string
+        todoIds:
+          description: Array of todo IDs to perform the action on
+          example:
+          - 123e4567-e89b-12d3-a456-426614174000
+          - 123e4567-e89b-12d3-a456-426614174001
+          items:
+            type: string
+          type: array
+      required:
+      - todoIds
+      - action
+      type: object
+    CreateTodoDto:
+      properties:
+        description:
+          description: Todo description
+          example: Write comprehensive documentation for the todo API
+          type: string
+        dueDate:
+          description: Todo due date
+          example: '2024-12-31T23:59:59.000Z'
+          format: date-time
+          type: string
+        priority:
+          default: 0
+          description: Todo priority (higher number = higher priority)
+          example: 1
+          minimum: 0
+          type: number
+        status:
+          default: pending
+          description: Todo status
+          example: pending
+          type: string
+        title:
+          description: Todo title
+          example: Complete project documentation
+          type: string
+      required:
+      - title
+      type: object
+    CreateUserDto:
+      properties:
+        email:
+          description: User email address
+          example: user@example.com
+          format: email
+          type: string
+        firstName:
+          description: User first name
+          example: John
+          type: string
+        lastName:
+          description: User last name
+          example: Doe
+          type: string
+        password:
+          description: User password
+          example: password123
+          minLength: 8
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    CustomStatusDto:
+      properties:
+        color:
+          description: Color code for the custom status
+          example: '#3b82f6'
+          type: string
+        id:
+          description: Unique identifier for the custom status
+          example: in-progress
+          type: string
+        name:
+          description: Display name for the custom status
+          example: In Progress
+          type: string
+        order:
+          description: Order/position of the status
+          example: 1
+          type: number
+      type: object
+    LoginDto:
+      properties:
+        email:
+          description: User email address
+          example: user@example.com
+          format: email
+          type: string
+        password:
+          description: User password
+          example: password123
+          minLength: 8
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    RefreshTokenDto:
+      properties:
+        refreshToken:
+          description: JWT refresh token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+          type: string
+      required:
+      - refreshToken
+      type: object
+    RegisterDto:
+      properties:
+        email:
+          description: User email address
+          example: user@example.com
+          format: email
+          type: string
+        firstName:
+          description: User first name
+          example: John
+          type: string
+        lastName:
+          description: User last name
+          example: Doe
+          type: string
+        password:
+          description: User password
+          example: password123
+          minLength: 8
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    UpdateSettingsDto:
+      properties:
+        customStatuses:
+          description: Array of custom status configurations
+          items:
+            $ref: '#/components/schemas/CustomStatusDto'
+          type: array
+        defaultView:
+          description: Default view preference
+          enum:
+          - kanban
+          - calendar
+          example: kanban
+          type: string
+        enableNotifications:
+          description: Whether to enable notifications
+          example: true
+          type: boolean
+        showCompletedTodos:
+          description: Whether to show completed todos
+          example: false
+          type: boolean
+      type: object
+    UpdateTodoDto:
+      properties:
+        isCompleted:
+          description: Whether the todo is completed
+          example: true
+          type: boolean
+      type: object
+    UpdateUserDto:
+      properties:
+        isActive:
+          description: User active status
+          example: true
+          type: boolean
+      type: object
+  securitySchemes:
+    JWT-auth:
+      bearerFormat: JWT
+      description: Enter JWT token
+      in: header
+      name: JWT
+      scheme: bearer
+      type: http
+info:
+  contact:
+    email: support@todo-app.com
+    name: Todo API Support
+  description: A comprehensive todo management API with user authentication, todo
+    management, and customizable settings
+  title: Todo Application API
+  version: '1.0'
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  user:
+                    properties:
+                      email:
+                        format: email
+                        type: string
+                      firstName:
+                        nullable: true
+                        type: string
+                      id:
+                        format: uuid
+                        type: string
+                      lastName:
+                        nullable: true
+                        type: string
+                    type: object
+                type: object
+          description: User successfully logged in
+        '401':
+          description: Invalid credentials
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      operationId: AuthController_logout
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Logged out successfully
+                    type: string
+                type: object
+          description: User successfully logged out
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Logout user
+      tags:
+      - auth
+  /auth/profile:
+    get:
+      operationId: AuthController_getProfile
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  createdAt:
+                    format: date-time
+                    type: string
+                  email:
+                    format: email
+                    type: string
+                  firstName:
+                    nullable: true
+                    type: string
+                  id:
+                    format: uuid
+                    type: string
+                  isActive:
+                    type: boolean
+                  lastName:
+                    nullable: true
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                type: object
+          description: User profile retrieved successfully
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Get current user profile
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      operationId: AuthController_refreshToken
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenDto'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                type: object
+          description: Token successfully refreshed
+        '401':
+          description: Invalid refresh token
+      summary: Refresh access token
+      tags:
+      - auth
+  /auth/register:
+    post:
+      operationId: AuthController_register
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  createdAt:
+                    format: date-time
+                    type: string
+                  email:
+                    format: email
+                    type: string
+                  firstName:
+                    nullable: true
+                    type: string
+                  id:
+                    format: uuid
+                    type: string
+                  isActive:
+                    type: boolean
+                  lastName:
+                    nullable: true
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                type: object
+          description: User successfully registered
+        '409':
+          description: User with this email already exists
+      summary: Register a new user
+      tags:
+      - auth
+  /settings:
+    get:
+      operationId: SettingsController_getSettings
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  customStatuses:
+                    items:
+                      properties:
+                        color:
+                          type: string
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        order:
+                          type: number
+                      type: object
+                    nullable: true
+                    type: array
+                  defaultView:
+                    default: kanban
+                    enum:
+                    - kanban
+                    - calendar
+                    type: string
+                  enableNotifications:
+                    default: true
+                    type: boolean
+                  id:
+                    format: uuid
+                    type: string
+                  showCompletedTodos:
+                    default: false
+                    type: boolean
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Settings retrieved successfully
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Get user settings
+      tags:
+      - settings
+    patch:
+      operationId: SettingsController_updateSettings
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingsDto'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  customStatuses:
+                    items:
+                      properties:
+                        color:
+                          type: string
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        order:
+                          type: number
+                      type: object
+                    nullable: true
+                    type: array
+                  defaultView:
+                    enum:
+                    - kanban
+                    - calendar
+                    type: string
+                  enableNotifications:
+                    type: boolean
+                  id:
+                    format: uuid
+                    type: string
+                  showCompletedTodos:
+                    type: boolean
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Settings updated successfully
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Update user settings
+      tags:
+      - settings
+  /settings/reset:
+    post:
+      operationId: SettingsController_resetToDefaults
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  customStatuses:
+                    items:
+                      properties:
+                        color:
+                          type: string
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        order:
+                          type: number
+                      type: object
+                    type: array
+                  defaultView:
+                    default: kanban
+                    type: string
+                  enableNotifications:
+                    default: true
+                    type: boolean
+                  id:
+                    format: uuid
+                    type: string
+                  showCompletedTodos:
+                    default: false
+                    type: boolean
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Settings reset to defaults successfully
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Reset settings to defaults
+      tags:
+      - settings
+  /todos:
+    get:
+      operationId: TodosController_findAll
+      parameters:
+      - description: 'Items per page (default: 10, max: 100)'
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: number
+      - description: 'Page number (default: 1)'
+        in: query
+        name: page
+        required: false
+        schema:
+          type: number
+      - description: Search in title and description
+        in: query
+        name: search
+        required: false
+        schema:
+          type: string
+      - description: Filter by status
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  data:
+                    items:
+                      properties:
+                        createdAt:
+                          format: date-time
+                          type: string
+                        description:
+                          nullable: true
+                          type: string
+                        dueDate:
+                          format: date-time
+                          nullable: true
+                          type: string
+                        id:
+                          format: uuid
+                          type: string
+                        isCompleted:
+                          type: boolean
+                        priority:
+                          type: number
+                        status:
+                          type: string
+                        title:
+                          type: string
+                        updatedAt:
+                          format: date-time
+                          type: string
+                      type: object
+                    type: array
+                  meta:
+                    properties:
+                      limit:
+                        type: number
+                      page:
+                        type: number
+                      total:
+                        type: number
+                      totalPages:
+                        type: number
+                    type: object
+                type: object
+          description: Todos retrieved successfully
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Get all todos for the current user
+      tags:
+      - todos
+    post:
+      operationId: TodosController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTodoDto'
+        required: true
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  createdAt:
+                    format: date-time
+                    type: string
+                  description:
+                    nullable: true
+                    type: string
+                  dueDate:
+                    format: date-time
+                    nullable: true
+                    type: string
+                  id:
+                    format: uuid
+                    type: string
+                  isCompleted:
+                    default: false
+                    type: boolean
+                  priority:
+                    default: 0
+                    type: number
+                  status:
+                    default: pending
+                    type: string
+                  title:
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Todo successfully created
+        '401':
+          description: Unauthorized
+      security:
+      - JWT-auth: []
+      summary: Create a new todo
+      tags:
+      - todos
+  /todos/bulk-action:
+    post:
+      operationId: TodosController_bulkAction
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkActionDto'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  affected:
+                    description: Number of todos affected
+                    type: number
+                type: object
+          description: Bulk action completed successfully
+        '401':
+          description: Unauthorized
+        '403':
+          description: Some todos do not belong to the user
+      security:
+      - JWT-auth: []
+      summary: Perform bulk actions on multiple todos
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      operationId: TodosController_remove
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Todo deleted successfully
+                    type: string
+                type: object
+          description: Todo deleted successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Todo not found
+      security:
+      - JWT-auth: []
+      summary: Delete a todo
+      tags:
+      - todos
+    get:
+      operationId: TodosController_findOne
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  createdAt:
+                    format: date-time
+                    type: string
+                  description:
+                    nullable: true
+                    type: string
+                  dueDate:
+                    format: date-time
+                    nullable: true
+                    type: string
+                  id:
+                    format: uuid
+                    type: string
+                  isCompleted:
+                    type: boolean
+                  priority:
+                    type: number
+                  status:
+                    type: string
+                  title:
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Todo retrieved successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Todo not found
+      security:
+      - JWT-auth: []
+      summary: Get a specific todo by ID
+      tags:
+      - todos
+    patch:
+      operationId: TodosController_update
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTodoDto'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  createdAt:
+                    format: date-time
+                    type: string
+                  description:
+                    nullable: true
+                    type: string
+                  dueDate:
+                    format: date-time
+                    nullable: true
+                    type: string
+                  id:
+                    format: uuid
+                    type: string
+                  isCompleted:
+                    type: boolean
+                  priority:
+                    type: number
+                  status:
+                    type: string
+                  title:
+                    type: string
+                  updatedAt:
+                    format: date-time
+                    type: string
+                  userId:
+                    format: uuid
+                    type: string
+                type: object
+          description: Todo updated successfully
+        '401':
+          description: Unauthorized
+        '404':
+          description: Todo not found
+      security:
+      - JWT-auth: []
+      summary: Update a todo
+      tags:
+      - todos
+  /users:
+    get:
+      operationId: UsersController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+      - users
+    post:
+      operationId: UsersController_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+        required: true
+      responses:
+        '201':
+          description: ''
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      operationId: UsersController_remove
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+      - users
+    get:
+      operationId: UsersController_findOne
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+      - users
+    patch:
+      operationId: UsersController_update
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+        required: true
+      responses:
+        '200':
+          description: ''
+      tags:
+      - users
+servers:
+- description: Development server
+  url: http://localhost:3000
+- description: Production server
+  url: https://api.todo-app.com
+tags:
+- description: Authentication endpoints
+  name: auth
+- description: User management endpoints
+  name: users
+- description: Todo management endpoints
+  name: todos
+- description: User settings endpoints
+  name: settings

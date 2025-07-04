@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Plus, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 
 interface QuickAddProps {
     onAddTodo: (values: { title: string; description: string }) => void;

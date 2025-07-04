@@ -4,16 +4,22 @@ import { Button } from "./ui/button";
 import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { StatusConfig, AppSettings } from "../services/save";
+import type { Todo } from "../interfaces/todo.interface";
+import { useStatusDeletion } from "../hooks/useStatusDeletion";
+import StatusDeletionConfirmDialog from "./StatusDeletionConfirmDialog";
 
 interface SettingsPanelProps {
     isOpen: boolean;
     onClose: () => void;
     settings: AppSettings;
     setSettings: (settings: AppSettings) => void;
+    todos: Todo[];
+    onTodosUpdate: (todos: Todo[]) => void;
 }
 
-export default function SettingsPanel({ isOpen, onClose, settings, setSettings }: SettingsPanelProps) {
+export default function SettingsPanel({ isOpen, onClose, settings, setSettings, todos, onTodosUpdate }: SettingsPanelProps) {
     const [editingStatus, setEditingStatus] = useState<string | null>(null);
+    const { pendingDeletion, checkStatusDeletion, confirmDeletion, cancelDeletion } = useStatusDeletion(todos, onTodosUpdate);
     
     const updateStatus = (id: string, updates: Partial<StatusConfig>) => {
         const newStatuses = settings.statuses.map(status => 
@@ -35,7 +41,16 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings }
 
     const deleteStatus = (id: string) => {
         if (settings.statuses.length <= 1) return; // Prevent deleting all statuses
-        setSettings({ statuses: settings.statuses.filter(status => status.id !== id) });
+        
+        const statusToDelete = settings.statuses.find(status => status.id === id);
+        if (!statusToDelete) return;
+
+        const canDelete = checkStatusDeletion(id, statusToDelete.label);
+        if (canDelete) {
+            // Safe to delete immediately - no todos affected
+            setSettings({ statuses: settings.statuses.filter(status => status.id !== id) });
+        }
+        // If canDelete is false, the confirmation dialog will be shown
     };
 
     const moveStatus = (id: string, direction: 'up' | 'down') => {
@@ -50,7 +65,30 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings }
         setSettings({ statuses: newStatuses });
     };
 
+    const handleConfirmDeletion = (action: 'delete' | 'reassign') => {
+        if (!pendingDeletion) return;
+
+        // Get the first status from the remaining statuses (excluding the one being deleted)
+        const remainingStatuses = settings.statuses.filter(status => status.id !== pendingDeletion.statusId);
+        const firstStatusId = remainingStatuses[0]?.id;
+        
+        confirmDeletion(action, firstStatusId);
+        
+        // Remove the status from settings after handling todos
+        setSettings({ 
+            statuses: remainingStatuses
+        });
+    };
+
     return (
+        <>
+            <StatusDeletionConfirmDialog
+                isOpen={!!pendingDeletion}
+                statusLabel={pendingDeletion?.statusLabel || ''}
+                affectedTodosCount={pendingDeletion?.affectedTodos.length || 0}
+                onConfirm={handleConfirmDeletion}
+                onCancel={cancelDeletion}
+            />
         <Dialog open={isOpen} onOpenChange={(open) => {
             if (!open) {
                 onClose();
@@ -145,5 +183,6 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings }
                 </div>
             </DialogContent>
         </Dialog>
+        </>
     );
 }
