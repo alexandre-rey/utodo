@@ -35,7 +35,7 @@ export const loadTodos = (): Todo[] => {
     try {
         const todos = JSON.parse(localStorage.getItem(TODOS_KEY) || "[]");
         // Convert date strings back to Date objects
-        return todos.map((todo: any) => ({
+        return todos.map((todo: Todo) => ({
             ...todo,
             createdAt: new Date(todo.createdAt),
             updatedAt: new Date(todo.updatedAt),
@@ -68,6 +68,25 @@ export const loadSettings = (): AppSettings => {
     } catch (error) {
         console.error("Failed to load settings from localStorage:", error);
         return DEFAULT_SETTINGS;
+    }
+}
+
+// Generic storage functions for compatibility
+export const loadFromStorage = <T>(key: string): T | null => {
+    try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+        console.error(`Failed to load ${key} from localStorage:`, error);
+        return null;
+    }
+}
+
+export const saveToStorage = <T>(key: string, data: T): void => {
+    try {
+        localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+        console.error(`Failed to save ${key} to localStorage:`, error);
     }
 }
 

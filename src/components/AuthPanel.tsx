@@ -4,62 +4,67 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface AuthPanelProps {
     isOpen: boolean;
     onClose: () => void;
-    onAuthSuccess: (user: { email: string; name: string }) => void;
 }
 
-export default function AuthPanel({ isOpen, onClose, onAuthSuccess }: AuthPanelProps) {
+export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
     const [isSignIn, setIsSignIn] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         password: "",
-        name: "",
+        firstName: "",
+        lastName: "",
         confirmPassword: ""
     });
-    const [isLoading, setIsLoading] = useState(false);
+    const { login, register, isLoading } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
 
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Fake authentication logic
-        if (isSignIn) {
-            // Sign In
-            if (formData.email && formData.password) {
-                onAuthSuccess({
+        try {
+            if (isSignIn) {
+                // Sign In
+                await login({
                     email: formData.email,
-                    name: formData.email.split('@')[0] // Use email prefix as name
+                    password: formData.password
                 });
-                resetForm();
-                onClose();
-            }
-        } else {
-            // Sign Up
-            if (formData.email && formData.password && formData.name && formData.password === formData.confirmPassword) {
-                onAuthSuccess({
+                toast.success("Welcome back!");
+            } else {
+                // Sign Up - validate passwords match
+                if (formData.password !== formData.confirmPassword) {
+                    toast.error("Passwords do not match");
+                    return;
+                }
+                
+                await register({
                     email: formData.email,
-                    name: formData.name
+                    password: formData.password,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName
                 });
-                resetForm();
-                onClose();
+                toast.success("Account created successfully!");
             }
+            
+            resetForm();
+            onClose();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Authentication failed";
+            toast.error(message);
         }
-
-        setIsLoading(false);
     };
 
     const resetForm = () => {
         setFormData({
             email: "",
             password: "",
-            name: "",
+            firstName: "",
+            lastName: "",
             confirmPassword: ""
         });
         setShowPassword(false);
@@ -96,23 +101,38 @@ export default function AuthPanel({ isOpen, onClose, onAuthSuccess }: AuthPanelP
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Name field - only for sign up */}
+                    {/* Name fields - only for sign up */}
                     {!isSignIn && (
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Full Name</Label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    placeholder="Enter your full name"
-                                    value={formData.name}
-                                    onChange={(e) => handleInputChange("name", e.target.value)}
-                                    className="pl-10"
-                                    required={!isSignIn}
-                                />
+                        <>
+                            <div className="space-y-2">
+                                <Label htmlFor="firstName">First Name</Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                                    <Input
+                                        id="firstName"
+                                        type="text"
+                                        placeholder="Enter your first name"
+                                        value={formData.firstName}
+                                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
                             </div>
-                        </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="lastName">Last Name</Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                                    <Input
+                                        id="lastName"
+                                        type="text"
+                                        placeholder="Enter your last name"
+                                        value={formData.lastName}
+                                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                                        className="pl-10"
+                                    />
+                                </div>
+                            </div>
+                        </>
                     )}
 
                     {/* Email field */}

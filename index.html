@@ -29,7 +29,7 @@
                 description: "Analyze spending and adjust allocations for Q2",
                 createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
                 updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-                status: "high",
+                status: "pending",
                 completed: false,
                 dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
               },
@@ -39,7 +39,7 @@
                 description: "Add recent projects and refresh design",
                 createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
                 updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                status: "medium",
+                status: "pending",
                 completed: false,
                 dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
               },
@@ -49,7 +49,7 @@
                 description: "Schedule routine cleaning",
                 createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                status: "low",
+                status: "pending",
                 completed: true,
                 dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago (was overdue but completed)
               },
@@ -59,7 +59,7 @@
                 description: "Create slides for product demo and Q&A session",
                 createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-                status: "urgent",
+                status: "pending",
                 completed: false,
                 dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) // Tomorrow (due soon)
               },
@@ -69,7 +69,7 @@
                 description: "Milk, bread, eggs, vegetables for the week",
                 createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-                status: "medium",
+                status: "pending",
                 completed: false,
                 dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) // Day after tomorrow
               },
@@ -79,7 +79,7 @@
                 description: "Compare React alternatives for next project",
                 createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                status: "low",
+                status: "pending",
                 completed: false
               },
               {
@@ -88,7 +88,7 @@
                 description: "Authentication flow is broken for mobile users",
                 createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                status: "urgent",
+                status: "pending",
                 completed: false,
                 dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // Yesterday (OVERDUE)
               },
@@ -98,7 +98,7 @@
                 description: "Book hotel and plan activities for mountain getaway",
                 createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-                status: "low",
+                status: "pending",
                 completed: false
               },
               {
@@ -107,108 +107,10 @@
                 description: "Daily sync with development team",
                 createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
                 updatedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-                status: "medium",
+                status: "pending",
                 completed: true
               },
-              {
-                id: crypto.randomUUID(),
-                title: "Write API documentation",
-                description: "Document new endpoints for user management",
-                createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
-                status: "high",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Order birthday gift",
-                description: "Find something nice for mom's birthday next week",
-                createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-                status: "medium",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Backup important files",
-                description: "Create backup of photos and documents to cloud storage",
-                createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
-                status: "low",
-                completed: true
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Code review for junior developer",
-                description: "Review pull request and provide feedback",
-                createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 4 * 60 * 60 * 1000),
-                status: "high",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Renew domain registration",
-                description: "Company website domain expires next month",
-                createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-                status: "medium",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Organize desk workspace",
-                description: "Clean up cables and organize office supplies",
-                createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-                status: "low",
-                completed: true
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Security audit review",
-                description: "Review and implement security recommendations",
-                createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                status: "urgent",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Learn new design tool",
-                description: "Complete Figma advanced techniques course",
-                createdAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000),
-                status: "low",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Update project timeline",
-                description: "Adjust milestones based on current progress",
-                createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-                status: "high",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Water the plants",
-                description: "Weekly watering for office plants",
-                createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-                status: "low",
-                completed: true
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Database optimization",
-                description: "Optimize slow queries and add missing indexes",
-                createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                status: "medium",
-                completed: false
-              }
+ 
             ];
             
             localStorage.setItem('todos', JSON.stringify(mockTodos));

@@ -29,7 +29,7 @@ export default function App() {
   // Custom hooks
   const { todos, setTodos, handleAddTodo, deleteTodo, saveTodo, handleTodoStatusChange, handleTodoCompletionToggle, completedCount } = useTodos();
   const { settings, handleSettingsChange } = useSettings();
-  const { user, handleAuthSuccess, handleSignOut } = useAuth();
+  const { user, handleSignOut } = useAuth();
   const { visibleTodos, allVisibleSelected } = useTodoFilters(todos, showCompleted, searchQuery);
   
   // For bulk actions, we need to pass a callback that triggers a re-render
@@ -107,7 +107,6 @@ export default function App() {
         <AuthPanel
           isOpen={isAuthOpen}
           onClose={() => setIsAuthOpen(false)}
-          onAuthSuccess={handleAuthSuccess}
         />
         {viewMode === 'kanban' ? (
           <DisplayTodos 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Todo } from "../interfaces/todo.interface";
+import { todoService } from "../services/todo.service";
 
 export function useBulkActions(todos: Todo[], setTodos: (todos: Todo[]) => void) {
   const [selectedTodos, setSelectedTodos] = useState<Set<string>>(new Set());
@@ -31,33 +32,67 @@ export function useBulkActions(todos: Todo[], setTodos: (todos: Todo[]) => void)
     }
   };
 
-  const handleBulkDelete = () => {
-    const updatedTodos = todos.filter(todo => !selectedTodos.has(todo.id));
-    setTodos(updatedTodos);
-    setSelectedTodos(new Set());
-    setIsSelectionMode(false);
+  const handleBulkDelete = async () => {
+    try {
+      const todoIds = Array.from(selectedTodos);
+      await todoService.bulkAction({
+        todoIds,
+        action: 'delete'
+      });
+      
+      // Update local state after successful API call
+      const updatedTodos = todos.filter(todo => !selectedTodos.has(todo.id));
+      setTodos(updatedTodos);
+      setSelectedTodos(new Set());
+      setIsSelectionMode(false);
+    } catch (error) {
+      console.error('Failed to bulk delete todos:', error);
+    }
   };
 
-  const handleBulkComplete = () => {
-    const updatedTodos = todos.map(todo => 
-      selectedTodos.has(todo.id) 
-        ? { ...todo, completed: true, updatedAt: new Date() }
-        : todo
-    );
-    setTodos(updatedTodos);
-    setSelectedTodos(new Set());
-    setIsSelectionMode(false);
+  const handleBulkComplete = async () => {
+    try {
+      const todoIds = Array.from(selectedTodos);
+      await todoService.bulkAction({
+        todoIds,
+        action: 'complete'
+      });
+      
+      // Update local state after successful API call
+      const updatedTodos = todos.map(todo => 
+        selectedTodos.has(todo.id) 
+          ? { ...todo, completed: true, updatedAt: new Date() }
+          : todo
+      );
+      setTodos(updatedTodos);
+      setSelectedTodos(new Set());
+      setIsSelectionMode(false);
+    } catch (error) {
+      console.error('Failed to bulk complete todos:', error);
+    }
   };
 
-  const handleBulkStatusChange = (newStatus: string) => {
-    const updatedTodos = todos.map(todo => 
-      selectedTodos.has(todo.id) 
-        ? { ...todo, status: newStatus, updatedAt: new Date() }
-        : todo
-    );
-    setTodos(updatedTodos);
-    setSelectedTodos(new Set());
-    setIsSelectionMode(false);
+  const handleBulkStatusChange = async (newStatus: string) => {
+    try {
+      const todoIds = Array.from(selectedTodos);
+      await todoService.bulkAction({
+        todoIds,
+        action: 'changeStatus',
+        newStatus
+      });
+      
+      // Update local state after successful API call
+      const updatedTodos = todos.map(todo => 
+        selectedTodos.has(todo.id) 
+          ? { ...todo, status: newStatus, updatedAt: new Date() }
+          : todo
+      );
+      setTodos(updatedTodos);
+      setSelectedTodos(new Set());
+      setIsSelectionMode(false);
+    } catch (error) {
+      console.error('Failed to bulk change status:', error);
+    }
   };
 
   const clearSelection = () => {

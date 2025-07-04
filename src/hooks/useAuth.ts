@@ -1,20 +1,25 @@
-import { useState } from "react";
+import { useAuth as useAuthContext } from "@/contexts/AuthContext";
 
 export function useAuth() {
-  const [user, setUser] = useState<{ email: string; name: string } | null>(null);
+  const { user, logout } = useAuthContext();
 
-  const handleAuthSuccess = (userData: { email: string; name: string }) => {
-    setUser(userData);
-    // TODO: In the future, sync todos from server when user signs in
+  const handleAuthSuccess = () => {
+    // Authentication is handled by the AuthContext now
+    // This function kept for compatibility with existing components
   };
 
-  const handleSignOut = () => {
-    setUser(null);
-    // TODO: In the future, clear synced data and keep only local data
+  const handleSignOut = async () => {
+    await logout();
   };
+
+  // Transform user data to match existing interface
+  const transformedUser = user ? {
+    email: user.email,
+    name: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : user.email.split('@')[0]
+  } : null;
 
   return {
-    user,
+    user: transformedUser,
     handleAuthSuccess,
     handleSignOut
   };
