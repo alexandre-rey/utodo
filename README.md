@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# µTodo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple way to manage todos - a React + TypeScript + Vite todo application with secure local storage.
 
 Currently, two official plugins are available:
 

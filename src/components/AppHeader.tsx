@@ -94,10 +94,10 @@ export default function AppHeader({
       <div className="w-full max-w-4xl px-6 pt-20 md:pt-8 pb-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2 tracking-tight">
-            ✨ Todo
+            ✨ µTodo
           </h1>
           <p className="text-slate-600 text-base md:text-lg">
-            Stay organized, stay productive
+            A simple way to manage todos
             {user && <span className="hidden sm:inline"> • Synced to your account</span>}
             {!user && <span className="hidden sm:inline"> • Working locally</span>}
           </p>

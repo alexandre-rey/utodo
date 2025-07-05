@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UTodo - Secure Todo Management</title>
+    <title>µTodo - A Simple Way to Manage Todos</title>
     
     <!-- CSRF Token for secure authentication -->
     <meta name="csrf-token" content="{% csrf_token %}" />
@@ -38,118 +38,5 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Dev Script: Create Mock Todos -->
-    <script>
-      // Only run in development (when using vite dev server)
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // Wait for app to load
-        setTimeout(() => {
-          const existingTodos = localStorage.getItem('todos');
-          
-          // Only create mock data if no todos exist
-          if (!existingTodos || JSON.parse(existingTodos).length === 0) {
-            console.log('🚀 Creating mock todos for development...');
-            
-            const mockTodos = [
-              {
-                id: crypto.randomUUID(),
-                title: "Review quarterly budget",
-                description: "Analyze spending and adjust allocations for Q2",
-                createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-                updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false,
-                dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 days from now
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Update portfolio website",
-                description: "Add recent projects and refresh design",
-                createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-                updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false,
-                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1 week from now
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Call dentist for appointment",
-                description: "Schedule routine cleaning",
-                createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-                status: "pending",
-                completed: true,
-                dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago (was overdue but completed)
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Prepare presentation for client meeting",
-                description: "Create slides for product demo and Q&A session",
-                createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-                status: "pending",
-                completed: false,
-                dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) // Tomorrow (due soon)
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Buy groceries",
-                description: "Milk, bread, eggs, vegetables for the week",
-                createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false,
-                dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) // Day after tomorrow
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Research new framework",
-                description: "Compare React alternatives for next project",
-                createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Fix production bug",
-                description: "Authentication flow is broken for mobile users",
-                createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false,
-                dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // Yesterday (OVERDUE)
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Plan weekend trip",
-                description: "Book hotel and plan activities for mountain getaway",
-                createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-                status: "pending",
-                completed: false
-              },
-              {
-                id: crypto.randomUUID(),
-                title: "Team standup meeting",
-                description: "Daily sync with development team",
-                createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-                updatedAt: new Date(Date.now() - 8 * 60 * 60 * 1000),
-                status: "pending",
-                completed: true
-              },
- 
-            ];
-            
-            localStorage.setItem('todos', JSON.stringify(mockTodos));
-            console.log(`✅ Created ${mockTodos.length} mock todos`);
-            
-            // Reload the page to show the mock data
-            window.location.reload();
-          }
-        }, 1000); // Wait 1 second for app to initialize
-      }
-    </script>
   </body>
 </html>
