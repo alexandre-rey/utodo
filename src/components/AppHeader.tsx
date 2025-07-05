@@ -1,5 +1,7 @@
 import { Button } from "./ui/button";
 import { Settings, Eye, EyeOff, Calendar, Columns, User, LogOut } from "lucide-react";
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 interface AppHeaderProps {
   viewMode: 'kanban' | 'calendar';
@@ -24,6 +26,7 @@ export default function AppHeader({
   setIsAuthOpen,
   setIsSettingsOpen
 }: AppHeaderProps) {
+  const { t } = useTranslation();
   return (
     <>
       {/* Top Right Controls */}
@@ -36,7 +39,7 @@ export default function AppHeader({
           onClick={() => setViewMode(viewMode === 'kanban' ? 'calendar' : 'kanban')}
         >
           {viewMode === 'kanban' ? <Calendar className="h-4 w-4 mr-2" /> : <Columns className="h-4 w-4 mr-2" />}
-          <span className="hidden sm:inline">{viewMode === 'kanban' ? 'Calendar' : 'Kanban'}</span>
+          <span className="hidden sm:inline">{viewMode === 'kanban' ? t('navigation.calendar') : t('navigation.kanban')}</span>
         </Button>
         
         {/* Show/Hide Completed Button */}
@@ -47,7 +50,7 @@ export default function AppHeader({
           onClick={() => setShowCompleted(!showCompleted)}
         >
           {showCompleted ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
-          <span className="hidden md:inline">{showCompleted ? "Hide" : "Show"} Completed </span>
+          <span className="hidden md:inline">{showCompleted ? t('navigation.hideCompleted') : t('navigation.showCompleted')} </span>
           <span>({completedCount})</span>
         </Button>
 
@@ -55,14 +58,14 @@ export default function AppHeader({
         {user ? (
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline text-sm text-slate-600">
-              Hello, {user.name}
+              {t('auth.hello', { name: user.name })}
             </span>
             <Button
               variant="ghost"
               size="icon"
               className="cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 border-0 hover:bg-white/70"
               onClick={handleSignOut}
-              title="Sign Out"
+              title={t('auth.signOut')}
             >
               <LogOut className="h-4 w-4" />
             </Button>
@@ -75,9 +78,12 @@ export default function AppHeader({
             onClick={() => setIsAuthOpen(true)}
           >
             <User className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Sign In</span>
+            <span className="hidden sm:inline">{t('auth.signIn')}</span>
           </Button>
         )}
+        
+        {/* Language Switcher */}
+        <LanguageSwitcher />
         
         {/* Settings Button */}
         <Button
@@ -85,6 +91,7 @@ export default function AppHeader({
           size="icon"
           className="cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 border-0 hover:bg-white/70"
           onClick={() => setIsSettingsOpen(true)}
+          title={t('navigation.settings')}
         >
           <Settings className="h-5 w-5" />
         </Button>
@@ -94,12 +101,12 @@ export default function AppHeader({
       <div className="w-full max-w-4xl px-6 pt-20 md:pt-8 pb-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-2 tracking-tight">
-            ✨ µTodo
+            ✨ {t('app.title')}
           </h1>
           <p className="text-slate-600 text-base md:text-lg">
-            A simple way to manage todos
-            {user && <span className="hidden sm:inline"> • Synced to your account</span>}
-            {!user && <span className="hidden sm:inline"> • Working locally</span>}
+            {t('app.tagline')}
+            {user && <span className="hidden sm:inline"> • {t('app.syncedAccount')}</span>}
+            {!user && <span className="hidden sm:inline"> • {t('app.workingLocally')}</span>}
           </p>
         </div>
       </div>

@@ -1,0 +1,69 @@
+{
+  "app": {
+    "title": "µTodo",
+    "tagline": "Un moyen simple de gérer vos tâches",
+    "syncedAccount": "Synchronisé avec votre compte",
+    "workingLocally": "Fonctionnement local"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signOut": "Se déconnecter",
+    "hello": "Bonjour, {{name}}"
+  },
+  "navigation": {
+    "calendar": "Calendrier",
+    "kanban": "Kanban",
+    "settings": "Paramètres",
+    "showCompleted": "Afficher terminées",
+    "hideCompleted": "Masquer terminées"
+  },
+  "todo": {
+    "title": "Titre",
+    "description": "Description",
+    "status": "Statut",
+    "createdAt": "Créé",
+    "updatedAt": "Modifié",
+    "pending": "En attente",
+    "inProgress": "En cours",
+    "done": "Terminé"
+  },
+  "actions": {
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "search": "Rechercher",
+    "clear": "Effacer",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner"
+  },
+  "dialogs": {
+    "addTodo": "Ajouter une tâche",
+    "editTodo": "Modifier la tâche",
+    "deleteTodo": "Supprimer la tâche",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
+    "bulkDelete": "Supprimer les tâches sélectionnées",
+    "confirmBulkDelete": "Êtes-vous sûr de vouloir supprimer {{count}} tâches sélectionnées ?"
+  },
+  "placeholders": {
+    "todoTitle": "Saisissez le titre de la tâche...",
+    "todoDescription": "Saisissez la description...",
+    "searchTodos": "Rechercher des tâches..."
+  },
+  "messages": {
+    "noTodos": "Aucune tâche trouvée",
+    "todoAdded": "Tâche ajoutée avec succès",
+    "todoUpdated": "Tâche mise à jour avec succès",
+    "todoDeleted": "Tâche supprimée avec succès",
+    "todosDeleted": "{{count}} tâches supprimées avec succès"
+  },
+  "errors": {
+    "titleRequired": "Le titre est requis",
+    "loadFailed": "Échec du chargement des tâches",
+    "saveFailed": "Échec de l'enregistrement de la tâche",
+    "deleteFailed": "Échec de la suppression de la tâche"
+  }
+}
