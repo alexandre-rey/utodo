@@ -8,7 +8,30 @@
   "auth": {
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "hello": "Hello, {{name}}"
+    "hello": "Hello, {{name}}",
+    "signinSuccess": "Welcome back",
+    "passwordMismatch": "Passwords do not match",
+    "accountCreated": "Account created successfully!",
+    "authFailed": "Authentication failed",
+    "createAccount": "Create Account",
+    "signInDesc": "Sign in to sync your todos across devices",
+    "signUpDesc": "Create an account to save your todos in the cloud",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "enterFirstName": "Enter your first name",
+    "enterLastName": "Enter your last name",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "confirmYourPassword": "Confirm your password",
+    "pleaseWait": "Please wait...",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signUpHere": "Sign up here",
+    "signInHere": "Sign in here",
+    "localModeNote": "You can also continue using the app locally without an account"
   },
   "navigation": {
     "calendar": "Calendar",
@@ -23,9 +46,18 @@
     "status": "Status",
     "createdAt": "Created",
     "updatedAt": "Updated",
+    "lastUpdated": "Last Updated",
     "pending": "Pending",
     "inProgress": "In Progress",
-    "done": "Done"
+    "done": "Done",
+    "completed": "Completed",
+    "dueDate": "Due Date (optional)",
+    "priority": "Priority Status",
+    "noDescription": "No description provided.",
+    "taskCompleted": "This task has been completed",
+    "taskPending": "This task is still pending",
+    "newTask": "New task",
+    "newStatus": "New Status"
   },
   "actions": {
     "add": "Add",
@@ -38,32 +70,83 @@
     "search": "Search",
     "clear": "Clear",
     "selectAll": "Select All",
-    "deselectAll": "Deselect All"
+    "deselectAll": "Deselect All",
+    "complete": "Complete",
+    "selected": "selected",
+    "status": "Status",
+    "statusColon": "Status:"
   },
   "dialogs": {
     "addTodo": "Add Todo",
+    "addTask": "Add task",
+    "addTaskDesc": "Add a new task to your todo list. You can edit or delete it later.",
     "editTodo": "Edit Todo",
+    "editTodoDesc": "Make changes to your todo item below.",
+    "todoDetails": "Todo details",
     "deleteTodo": "Delete Todo",
     "confirmDelete": "Are you sure you want to delete this todo?",
     "bulkDelete": "Delete Selected Todos",
-    "confirmBulkDelete": "Are you sure you want to delete {{count}} selected todos?"
+    "confirmBulkDelete": "Are you sure you want to delete {{count}} selected todos?",
+    "deleteStatus": "Delete Status Column",
+    "deleteStatusDesc": "What should happen to the todos in this status?",
+    "settings": "Settings",
+    "settingsDesc": "Configure your todo application preferences."
   },
   "placeholders": {
     "todoTitle": "Enter todo title...",
     "todoDescription": "Enter description...",
-    "searchTodos": "Search todos..."
+    "searchTodos": "Search todos...",
+    "whatNeedsDone": "What needs to be done?",
+    "whatShouldBeDone": "What should be done",
+    "addDescriptionOptional": "Add description (optional)...",
+    "searchTodosShortcut": "Search todos... (Ctrl+K)",
+    "updateStatus": "Update status"
   },
   "messages": {
     "noTodos": "No todos found",
     "todoAdded": "Todo added successfully",
     "todoUpdated": "Todo updated successfully",
     "todoDeleted": "Todo deleted successfully",
-    "todosDeleted": "{{count}} todos deleted successfully"
+    "todosDeleted": "{{count}} todos deleted successfully",
+    "selectedCount": "{{count}} selected",
+    "dropTodoHere": "Drop todo here",
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.",
+    "errorDetails": "Error details",
+    "tryAgain": "Try Again",
+    "refreshPage": "Refresh Page",
+    "statusColumns": "Status Columns",
+    "addStatus": "Add Status",
+    "moveTodosToFirst": "Move todos to first status",
+    "moveTodosDesc": "All todos will be moved to your first status column",
+    "deleteTodosPermanently": "Delete todos permanently",
+    "deleteTodosDesc": "All todos in this status will be permanently deleted",
+    "todosInStatus": "{{count}} {{todoText}} {{verb}} currently in the {{status}} status."
   },
   "errors": {
     "titleRequired": "Title is required",
     "loadFailed": "Failed to load todos",
     "saveFailed": "Failed to save todo",
-    "deleteFailed": "Failed to delete todo"
+    "deleteFailed": "Failed to delete todo",
+    "invalidInput": "Invalid input",
+    "permissionDenied": "Permission denied",
+    "permissionDeniedDesc": "You do not have permission to modify settings",
+    "settingsUpdateFailed": "Failed to save settings",
+    "settingsUpdateFailedDesc": "Your changes could not be saved. Please try again."
+  },
+  "dates": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "daysOverdue": "days overdue",
+    "days": "days",
+    "due": "Due: ",
+    "overdue": "⚠️ Overdue",
+    "noDueDate": "📋 No Due Date"
+  },
+  "sections": {
+    "description": "📝 Description",
+    "priority": "🏷️ Priority Status",
+    "dueDate": "📅 Due Date"
   }
 }

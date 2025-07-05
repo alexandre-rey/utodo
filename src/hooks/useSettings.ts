@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { settingsService } from "../services/settings.service";
 import { useAuth as useAuthContext } from "@/contexts/AuthContext";
 import type { UserSettings } from "@/types/api";
@@ -34,6 +36,7 @@ const transformToUserSettings = (appSettings: AppSettings): Partial<UserSettings
 };
 
 export function useSettings() {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AppSettings>({
     statuses: [
       { id: "pending", label: "Pending", color: "#6b7280" },
@@ -66,8 +69,20 @@ export function useSettings() {
       const userSettingsUpdate = transformToUserSettings(newSettings);
       await settingsService.updateSettings(userSettingsUpdate);
       setSettings(newSettings);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to update settings:', error);
+      
+      // Show user-friendly error message
+      const errorMessage = error instanceof Error ? error.message : '';
+      if (errorMessage.includes('permission')) {
+        toast.error(t('errors.permissionDenied'), {
+          description: t('errors.permissionDeniedDesc')
+        });
+      } else {
+        toast.error(t('errors.settingsUpdateFailed'), {
+          description: t('errors.settingsUpdateFailedDesc')
+        });
+      }
     }
   };
 

@@ -7,6 +7,7 @@ import type { StatusConfig, AppSettings } from "../services/save";
 import type { Todo } from "../interfaces/todo.interface";
 import { useStatusDeletion } from "../hooks/useStatusDeletion";
 import StatusDeletionConfirmDialog from "./StatusDeletionConfirmDialog";
+import { useTranslation } from 'react-i18next';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ isOpen, onClose, settings, setSettings, todos, onTodosUpdate }: SettingsPanelProps) {
+    const { t } = useTranslation();
     const [editingStatus, setEditingStatus] = useState<string | null>(null);
     const { pendingDeletion, checkStatusDeletion, confirmDeletion, cancelDeletion } = useStatusDeletion(todos, onTodosUpdate);
     
@@ -32,7 +34,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         const newId = `status_${Date.now()}`;
         const newStatus: StatusConfig = {
             id: newId,
-            label: "New Status",
+            label: t('todo.newStatus'),
             color: "#e5e7eb"
         };
         setSettings({ statuses: [...settings.statuses, newStatus] });
@@ -96,19 +98,19 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         }}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Settings</DialogTitle>
+                    <DialogTitle>{t('dialogs.settings')}</DialogTitle>
                     <DialogDescription>
-                        Configure your todo application preferences.
+                        {t('dialogs.settingsDesc')}
                     </DialogDescription>
                 </DialogHeader>
                 
                 <div className="grid gap-6 py-4 max-h-96 overflow-y-auto">
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">Status Columns</h3>
+                            <h3 className="text-lg font-semibold">{t('messages.statusColumns')}</h3>
                             <Button onClick={addStatus} size="sm" variant="outline">
                                 <Plus className="h-4 w-4 mr-1" />
-                                Add Status
+                                {t('messages.addStatus')}
                             </Button>
                         </div>
                         

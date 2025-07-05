@@ -1,6 +1,7 @@
 import { apiClient } from '@/lib/api-client';
 import { loadFromStorage, saveToStorage } from '@/services/save';
-import { type UserSettings, type UpdateSettingsDto, type CustomStatus } from '@/types/api';
+import { subscriptionService } from '@/services/subscription.service';
+import { type UserSettings, type UpdateSettingsDto, type CustomStatus, type ApiError } from '@/types/api';
 
 const DEFAULT_SETTINGS: UserSettings = {
   id: 'local-settings',
@@ -38,12 +39,23 @@ class SettingsService {
       return this.updateLocalSettings(data);
     }
 
+    // Check status limits if we're adding custom statuses
+    if (data.customStatuses) {
+      await this.validateStatusLimits(data.customStatuses);
+    }
+
     try {
       const updatedSettings = await apiClient.patch<UserSettings>('/settings', data);
       // Don't save to localStorage when authenticated - keep them separate
       return updatedSettings;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to update settings on server:', error);
+      
+      // Don't fall back to local storage for permission errors
+      if (typeof error === 'object' && error !== null && 'statusCode' in error && (error as ApiError).statusCode === 403) {
+        throw new Error('You do not have permission to modify settings');
+      }
+      
       return this.updateLocalSettings(data);
     }
   }
@@ -57,8 +69,14 @@ class SettingsService {
       const resetSettings = await apiClient.post<UserSettings>('/settings/reset');
       // Don't save to localStorage when authenticated - keep them separate
       return resetSettings;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to reset settings on server:', error);
+      
+      // Don't fall back to local storage for permission errors
+      if (typeof error === 'object' && error !== null && 'statusCode' in error && (error as ApiError).statusCode === 403) {
+        throw new Error('You do not have permission to reset settings');
+      }
+      
       return this.resetLocalSettings();
     }
   }
@@ -136,6 +154,39 @@ class SettingsService {
 
   public getDefaultStatuses(): CustomStatus[] {
     return DEFAULT_SETTINGS.customStatuses || [];
+  }
+
+  private async validateStatusLimits(customStatuses: CustomStatus[]): Promise<void> {
+    if (!apiClient.isAuthenticated()) {
+      return; // Skip validation for local users
+    }
+
+    try {
+      const statusLimits = await subscriptionService.getStatusLimits();
+      const currentSettings = await this.getSettings();
+      const currentStatusCount = currentSettings.customStatuses?.length || 0;
+      const newStatusCount = customStatuses.length;
+
+      // Check if we're adding more statuses than allowed
+      if (newStatusCount > currentStatusCount && newStatusCount > statusLimits.maxCustomStatuses) {
+        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.maxCustomStatuses} custom statuses. Upgrade to premium for unlimited statuses.`);
+      }
+
+      // Check if we're already at the limit and trying to add more
+      if (newStatusCount > statusLimits.maxCustomStatuses) {
+        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.maxCustomStatuses} custom statuses. Upgrade to premium for unlimited statuses.`);
+      }
+    } catch (error) {
+      // Re-throw limit errors, but don't block on API failures
+      if (error instanceof Error && error.message.includes('Status limit exceeded')) {
+        throw error;
+      }
+      console.warn('Could not validate status limits:', error);
+    }
+  }
+
+  public async getStatusLimits() {
+    return await subscriptionService.getStatusLimits();
   }
 }
 

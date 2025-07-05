@@ -4,26 +4,27 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
 
 interface AddDialogProps {
     onAddTodo: (values: { title: string; description: string }) => void;
 }
 
 export default function AddDialog({ onAddTodo }: AddDialogProps) {
-
-    const [title, setTitle] = useState("New task");
+    const { t } = useTranslation();
+    const [title, setTitle] = useState(t('todo.newTask'));
     const [description, setDescription] = useState("");
 
     const onSaveClick = (e: React.FormEvent) => {
 
         if (title.trim() === "") {
             e.preventDefault();
-            toast.error("Title is required");
+            toast.error(t('errors.titleRequired'));
             return;
         }
 
         onAddTodo({ title, description });
-        setTitle("New task");
+        setTitle(t('todo.newTask'));
         setDescription("");
     }
 
@@ -31,31 +32,31 @@ export default function AddDialog({ onAddTodo }: AddDialogProps) {
         <Dialog>
             <form>
                 <DialogTrigger asChild>
-                    <Button variant="outline">Add</Button>
+                    <Button variant="outline">{t('actions.add')}</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Add task</DialogTitle>
+                        <DialogTitle>{t('dialogs.addTask')}</DialogTitle>
                         <DialogDescription>
-                            Add a new task to your todo list. You can edit or delete it later.
+                            {t('dialogs.addTaskDesc')}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4">
                         <div className="grid gap-3">
-                            <Label htmlFor="name-1">Title</Label>
+                            <Label htmlFor="name-1">{t('todo.title')}</Label>
                             <Input id="name-1" name="name" defaultValue={title} onChange={(e) => setTitle(e.target.value)} />
                         </div>
                         <div className="grid gap-3">
-                            <Label htmlFor="username-1">Description</Label>
-                            <Input id="username-1" name="username" placeholder="What should be done" value={description} onChange={(e) => setDescription(e.target.value)} />
+                            <Label htmlFor="username-1">{t('todo.description')}</Label>
+                            <Input id="username-1" name="username" placeholder={t('placeholders.whatShouldBeDone')} value={description} onChange={(e) => setDescription(e.target.value)} />
                         </div>
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">{t('actions.cancel')}</Button>
                         </DialogClose>
                         <DialogTrigger asChild>
-                            <Button type="submit" onClick={e => onSaveClick(e)}>Save</Button>
+                            <Button type="submit" onClick={e => onSaveClick(e)}>{t('actions.save')}</Button>
                         </DialogTrigger>
                     </DialogFooter>
                 </DialogContent>

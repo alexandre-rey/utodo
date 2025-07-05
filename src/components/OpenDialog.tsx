@@ -10,6 +10,7 @@ import type { StatusConfig } from "../services/save";
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import { sanitizeTodoContent } from "@/utils/sanitize";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -22,6 +23,7 @@ interface OpenDialogProps {
 }
 
 export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, statuses }: OpenDialogProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [status, setStatus] = useState("");
@@ -45,7 +47,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                 const sanitizedDescription = sanitizeTodoContent(description);
                 
                 if (!sanitizedTitle) {
-                    toast.error("Title is required");
+                    toast.error(t('errors.titleRequired'));
                     return;
                 }
                 
@@ -59,7 +61,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                 saveTodo(updatedTodo);
                 setIsEditing(false); // Return to view mode after saving
             } catch (error) {
-                const message = error instanceof Error ? error.message : "Invalid input";
+                const message = error instanceof Error ? error.message : t('errors.invalidInput');
                 toast.error(message);
             }
         }
@@ -106,11 +108,11 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
         const diffTime = due.getTime() - now.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        if (diffDays === 0) return "Today";
-        if (diffDays === 1) return "Tomorrow";
-        if (diffDays === -1) return "Yesterday";
-        if (diffDays < -1) return `${Math.abs(diffDays)} days overdue`;
-        if (diffDays < 7) return `${diffDays} days`;
+        if (diffDays === 0) return t('dates.today');
+        if (diffDays === 1) return t('dates.tomorrow');
+        if (diffDays === -1) return t('dates.yesterday');
+        if (diffDays < -1) return `${Math.abs(diffDays)} ${t('dates.daysOverdue')}`;
+        if (diffDays < 7) return `${diffDays} ${t('dates.days')}`;
         
         return due.toLocaleDateString();
     };
@@ -124,9 +126,9 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
             <form>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>{isEditing ? "Edit Todo" : todo?.title}</DialogTitle>
+                        <DialogTitle>{isEditing ? t('dialogs.editTodo') : todo?.title}</DialogTitle>
                         <DialogDescription>
-                            {isEditing ? "Make changes to your todo item below." : "Todo details"}
+                            {isEditing ? t('dialogs.editTodoDesc') : t('dialogs.todoDetails')}
                         </DialogDescription>
                     </DialogHeader>
                     
@@ -143,10 +145,10 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                     )}
                                     <div>
                                         <p className="font-medium text-slate-800">
-                                            {todo?.completed ? "Completed" : "In Progress"}
+                                            {todo?.completed ? t('todo.completed') : t('todo.inProgress')}
                                         </p>
                                         <p className="text-sm text-slate-600">
-                                            {todo?.completed ? "This task has been completed" : "This task is still pending"}
+                                            {todo?.completed ? t('todo.taskCompleted') : t('todo.taskPending')}
                                         </p>
                                     </div>
                                 </div>
@@ -155,11 +157,11 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                             {/* Description */}
                             <div className="space-y-3">
                                 <Label className="text-base font-semibold text-slate-700 flex items-center gap-2">
-                                    📝 Description
+                                    {t('sections.description')}
                                 </Label>
                                 <Card className="p-4 bg-white/60 backdrop-blur-sm border-0 shadow-sm">
                                     <p className="text-slate-700 leading-relaxed">
-                                        {todo?.description || "No description provided."}
+                                        {todo?.description || t('todo.noDescription')}
                                     </p>
                                 </Card>
                             </div>
@@ -167,7 +169,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                             {/* Status */}
                             <div className="space-y-3">
                                 <Label className="text-base font-semibold text-slate-700 flex items-center gap-2">
-                                    🏷️ Priority Status
+                                    {t('sections.priority')}
                                 </Label>
                                 <Card className="p-4 bg-white/60 backdrop-blur-sm border-0 shadow-sm">
                                     <div className="flex items-center gap-3">
@@ -186,7 +188,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                             {todo?.dueDate && (
                                 <div className="space-y-3">
                                     <Label className="text-base font-semibold text-slate-700 flex items-center gap-2">
-                                        📅 Due Date
+                                        {t('sections.dueDate')}
                                     </Label>
                                     <Card className={`p-4 border-0 shadow-sm ${
                                         getDueDateStatus(todo.dueDate) === 'overdue' && !todo.completed ? 'bg-gradient-to-r from-red-50 to-pink-50' :
@@ -226,7 +228,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-slate-600 flex items-center gap-2">
                                         <User className="h-4 w-4" />
-                                        Created
+                                        {t('todo.createdAt')}
                                     </Label>
                                     <Card className="p-3 bg-white/40 backdrop-blur-sm border-0 shadow-sm">
                                         <p className="text-sm text-slate-700">
@@ -244,7 +246,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                 <div className="space-y-2">
                                     <Label className="text-sm font-medium text-slate-600 flex items-center gap-2">
                                         <Clock className="h-4 w-4" />
-                                        Last Updated
+                                        {t('todo.lastUpdated')}
                                     </Label>
                                     <Card className="p-3 bg-white/40 backdrop-blur-sm border-0 shadow-sm">
                                         <p className="text-sm text-slate-700">
@@ -264,7 +266,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                         // Edit Mode
                         <div className="grid gap-4">
                             <div className="grid gap-3">
-                                <Label htmlFor="title">Title</Label>
+                                <Label htmlFor="title">{t('todo.title')}</Label>
                                 <Input 
                                     id="title" 
                                     value={title} 
@@ -272,19 +274,19 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                 />
                             </div>
                             <div className="grid gap-3">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="description">{t('todo.description')}</Label>
                                 <Input 
                                     id="description" 
                                     value={description} 
                                     onChange={(e) => setDescription(e.target.value)}
-                                    placeholder="What should be done"
+                                    placeholder={t('placeholders.whatShouldBeDone')}
                                 />
                             </div>
                             <div className="flex flex-row gap-2">
-                                <Label>Status:</Label>
+                                <Label>{t('actions.statusColon')}</Label>
                                 <Select onValueChange={(value) => setStatus(value)} value={status}>
                                     <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Update status" />
+                                        <SelectValue placeholder={t('placeholders.updateStatus')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {statuses.map(statusConfig => (
@@ -296,7 +298,7 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                 </Select>
                             </div>
                             <div className="grid gap-3">
-                                <Label htmlFor="due-date">Due Date (optional)</Label>
+                                <Label htmlFor="due-date">{t('todo.dueDate')}</Label>
                                 <Input
                                     id="due-date"
                                     type="date"
@@ -317,17 +319,18 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                     onClick={() => {
                                         if (todo) {
                                             deleteTodo(todo.id);
+                                            closeDialog();
                                         }
                                     }}
                                 >
-                                    Delete
+                                    {t('actions.delete')}
                                 </Button>
                                 <Button 
                                     variant="default" 
                                     className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200 hover:scale-105"
                                     onClick={() => setIsEditing(true)}
                                 >
-                                    Edit
+                                    {t('actions.edit')}
                                 </Button>
                             </>
                         ) : (
@@ -338,14 +341,14 @@ export default function OpenDialog({ todo, closeDialog, deleteTodo, saveTodo, st
                                     className="transition-all duration-200 hover:scale-105"
                                     onClick={handleCancel}
                                 >
-                                    Cancel
+                                    {t('actions.cancel')}
                                 </Button>
                                 <Button 
                                     variant="default" 
                                     className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 transition-all duration-200 hover:scale-105"
                                     onClick={handleSave}
                                 >
-                                    Save
+                                    {t('actions.save')}
                                 </Button>
                             </>
                         )}

@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import type { StatusConfig } from "../services/save";
 import { useState } from "react";
 import { Check, Calendar, AlertTriangle, Square, CheckSquare } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface DisplayTodosProps {
     todos: Todo[];
@@ -32,6 +33,7 @@ export default function DisplayTodos({
     onTodoSelection, 
     onEnterSelectionMode 
 }: DisplayTodosProps) {
+    const { t } = useTranslation();
     const [draggedTodo, setDraggedTodo] = useState<string | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
 
@@ -57,11 +59,11 @@ export default function DisplayTodos({
         const diffTime = due.getTime() - now.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
-        if (diffDays === 0) return "Today";
-        if (diffDays === 1) return "Tomorrow";
-        if (diffDays === -1) return "Yesterday";
-        if (diffDays < -1) return `${Math.abs(diffDays)} days overdue`;
-        if (diffDays < 7) return `${diffDays} days`;
+        if (diffDays === 0) return t('dates.today');
+        if (diffDays === 1) return t('dates.tomorrow');
+        if (diffDays === -1) return t('dates.yesterday');
+        if (diffDays < -1) return `${Math.abs(diffDays)} ${t('dates.daysOverdue')}`;
+        if (diffDays < 7) return `${diffDays} ${t('dates.days')}`;
         
         return due.toLocaleDateString();
     };
@@ -193,7 +195,7 @@ export default function DisplayTodos({
                                             )}
                                         </div>
                                         <p className={`text-sm text-gray-600 h-16 overflow-hidden text-ellipsis mb-2 leading-relaxed ${todo.completed ? 'line-through' : ''}`}>
-                                            {todo.description || "No description provided."}
+                                            {todo.description || t('todo.noDescription')}
                                         </p>
                                         {todo.dueDate && (
                                             <div className={`flex items-center gap-1 text-xs ${
@@ -227,7 +229,7 @@ export default function DisplayTodos({
                     })}
                         {statusTodos.length === 0 && isDropTarget && (
                             <div className="text-center text-slate-400 py-8 text-sm">
-                                Drop todo here
+                                {t('messages.dropTodoHere')}
                             </div>
                         )}
                     </div>

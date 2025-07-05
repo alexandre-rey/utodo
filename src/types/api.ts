@@ -135,3 +135,22 @@ export interface TodoQueryParams {
   search?: string;
   status?: string;
 }
+
+export interface SubscriptionStatus {
+  id?: string;
+  status: 'active' | 'inactive' | 'cancelled' | 'past_due';
+  plan: 'free' | 'premium';
+  currentPeriodStart?: string;
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd?: boolean;
+}
+
+export interface CreateSubscriptionDto {
+  priceId: string;
+}
+
+export interface StatusLimits {
+  maxCustomStatuses: number;
+  currentCustomStatuses: number;
+  canCreateMore: boolean;
+}

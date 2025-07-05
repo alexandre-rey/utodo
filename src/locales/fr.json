@@ -8,7 +8,30 @@
   "auth": {
     "signIn": "Se connecter",
     "signOut": "Se déconnecter",
-    "hello": "Bonjour, {{name}}"
+    "hello": "Bonjour, {{name}}",
+    "createAccount": "Créer un compte",
+    "signInDesc": "Connectez-vous pour synchroniser vos tâches sur tous vos appareils",
+    "signUpDesc": "Créez un compte pour sauvegarder vos tâches dans le cloud",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "enterFirstName": "Entrez votre prénom",
+    "enterLastName": "Entrez votre nom",
+    "enterEmail": "Entrez votre email",
+    "enterPassword": "Entrez votre mot de passe",
+    "confirmYourPassword": "Confirmez votre mot de passe",
+    "pleaseWait": "Veuillez patienter...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "signUpHere": "Inscrivez-vous ici",
+    "signInHere": "Connectez-vous ici",
+    "localModeNote": "Vous pouvez aussi continuer à utiliser l'application en local sans compte",
+    "signinSuccess": "Bon retour !",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "accountCreated": "Compte créé avec succès !",
+    "authFailed": "Échec de l'authentification"
   },
   "navigation": {
     "calendar": "Calendrier",
@@ -23,9 +46,18 @@
     "status": "Statut",
     "createdAt": "Créé",
     "updatedAt": "Modifié",
+    "lastUpdated": "Dernière modification",
     "pending": "En attente",
     "inProgress": "En cours",
-    "done": "Terminé"
+    "done": "Terminé",
+    "completed": "Terminé",
+    "dueDate": "Date d'échéance (optionnelle)",
+    "priority": "Statut",
+    "noDescription": "Aucune description fournie.",
+    "taskCompleted": "Cette tâche a été terminée",
+    "taskPending": "Cette tâche est toujours en attente",
+    "newTask": "Nouvelle tâche",
+    "newStatus": "Nouveau statut"
   },
   "actions": {
     "add": "Ajouter",
@@ -38,32 +70,83 @@
     "search": "Rechercher",
     "clear": "Effacer",
     "selectAll": "Tout sélectionner",
-    "deselectAll": "Tout désélectionner"
+    "deselectAll": "Tout désélectionner",
+    "complete": "Terminer",
+    "selected": "sélectionné(e)s",
+    "status": "Statut",
+    "statusColon": "Statut :"
   },
   "dialogs": {
     "addTodo": "Ajouter une tâche",
+    "addTask": "Ajouter une tâche",
+    "addTaskDesc": "Ajoutez une nouvelle tâche à votre liste de tâches. Vous pourrez la modifier ou la supprimer plus tard.",
     "editTodo": "Modifier la tâche",
+    "editTodoDesc": "Apportez des modifications à votre tâche ci-dessous.",
+    "todoDetails": "Détails de la tâche",
     "deleteTodo": "Supprimer la tâche",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette tâche ?",
     "bulkDelete": "Supprimer les tâches sélectionnées",
-    "confirmBulkDelete": "Êtes-vous sûr de vouloir supprimer {{count}} tâches sélectionnées ?"
+    "confirmBulkDelete": "Êtes-vous sûr de vouloir supprimer {{count}} tâches sélectionnées ?",
+    "deleteStatus": "Supprimer la colonne de statut",
+    "deleteStatusDesc": "Que devrait-il arriver aux tâches dans ce statut ?",
+    "settings": "Paramètres",
+    "settingsDesc": "Configurez les préférences de votre application de tâches."
   },
   "placeholders": {
     "todoTitle": "Saisissez le titre de la tâche...",
     "todoDescription": "Saisissez la description...",
-    "searchTodos": "Rechercher des tâches..."
+    "searchTodos": "Rechercher des tâches...",
+    "whatNeedsDone": "Qu'est-ce qui doit être fait ?",
+    "whatShouldBeDone": "Que faut-il faire",
+    "addDescriptionOptional": "Ajouter une description (optionnel)...",
+    "searchTodosShortcut": "Rechercher des tâches... (Ctrl+K)",
+    "updateStatus": "Mettre à jour le statut"
   },
   "messages": {
     "noTodos": "Aucune tâche trouvée",
     "todoAdded": "Tâche ajoutée avec succès",
     "todoUpdated": "Tâche mise à jour avec succès",
     "todoDeleted": "Tâche supprimée avec succès",
-    "todosDeleted": "{{count}} tâches supprimées avec succès"
+    "todosDeleted": "{{count}} tâches supprimées avec succès",
+    "selectedCount": "{{count}} sélectionné(e)s",
+    "dropTodoHere": "Déposer la tâche ici",
+    "somethingWentWrong": "Quelque chose s'est mal passé",
+    "unexpectedError": "Une erreur inattendue s'est produite. Veuillez rafraîchir la page ou contacter le support si le problème persiste.",
+    "errorDetails": "Détails de l'erreur",
+    "tryAgain": "Réessayer",
+    "refreshPage": "Actualiser la page",
+    "statusColumns": "Colonnes de statut",
+    "addStatus": "Ajouter un statut",
+    "moveTodosToFirst": "Déplacer les tâches vers le premier statut",
+    "moveTodosDesc": "Toutes les tâches seront déplacées vers votre première colonne de statut",
+    "deleteTodosPermanently": "Supprimer les tâches définitivement",
+    "deleteTodosDesc": "Toutes les tâches dans ce statut seront supprimées définitivement",
+    "todosInStatus": "{{count}} {{todoText}} {{verb}} actuellement dans le statut {{status}}."
   },
   "errors": {
     "titleRequired": "Le titre est requis",
     "loadFailed": "Échec du chargement des tâches",
     "saveFailed": "Échec de l'enregistrement de la tâche",
-    "deleteFailed": "Échec de la suppression de la tâche"
+    "deleteFailed": "Échec de la suppression de la tâche",
+    "invalidInput": "Entrée invalide",
+    "permissionDenied": "Autorisation refusée",
+    "permissionDeniedDesc": "Vous n'avez pas l'autorisation de modifier les paramètres",
+    "settingsUpdateFailed": "Échec de l'enregistrement des paramètres",
+    "settingsUpdateFailedDesc": "Vos modifications n'ont pas pu être enregistrées. Veuillez réessayer."
+  },
+  "dates": {
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "yesterday": "Hier",
+    "daysOverdue": "jours de retard",
+    "days": "jours",
+    "due": "Échéance : ",
+    "overdue": "⚠️ En retard",
+    "noDueDate": "📋 Pas d'échéance"
+  },
+  "sections": {
+    "description": "📝 Description",
+    "priority": "🏷️ Statut de priorité",
+    "dueDate": "📅 Date d'échéance"
   }
 }

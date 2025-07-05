@@ -2,6 +2,7 @@ import type { Todo } from "../interfaces/todo.interface";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Check, Calendar, Square, CheckSquare } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 interface CalendarViewProps {
     todos: Todo[];
@@ -26,6 +27,7 @@ export default function CalendarView({
     onTodoSelection,
     onEnterSelectionMode
 }: CalendarViewProps) {
+    const { t } = useTranslation();
     // Filter todos based on search and completion
     const filteredTodos = todos.filter(todo => {
         const shouldShow = showCompleted || !todo.completed;
@@ -62,9 +64,9 @@ export default function CalendarView({
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
 
-        if (date.toDateString() === today.toDateString()) return "Today";
-        if (date.toDateString() === tomorrow.toDateString()) return "Tomorrow";
-        if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+        if (date.toDateString() === today.toDateString()) return t('dates.today');
+        if (date.toDateString() === tomorrow.toDateString()) return t('dates.tomorrow');
+        if (date.toDateString() === yesterday.toDateString()) return t('dates.yesterday');
         
         return date.toLocaleDateString('en-US', { 
             weekday: 'long', 
@@ -87,7 +89,7 @@ export default function CalendarView({
                 {sortedDates.some(date => isOverdue(date) && todosByDate[date].some(todo => !todo.completed)) && (
                     <div>
                         <h3 className="text-lg font-semibold mb-3 text-red-600 flex items-center gap-2">
-                            ⚠️ Overdue
+                            {t('dates.overdue')}
                         </h3>
                         <div className="space-y-2">
                             {sortedDates
@@ -132,10 +134,10 @@ export default function CalendarView({
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-medium truncate">{todo.title}</h4>
                                                 <p className="text-sm text-gray-600 truncate">
-                                                    {todo.description || "No description"}
+                                                    {todo.description || t('todo.noDescription')}
                                                 </p>
                                                 <p className="text-xs text-red-600 mt-1">
-                                                    Due: {new Date(todo.dueDate!).toLocaleDateString()}
+                                                    {t('dates.due')}{new Date(todo.dueDate!).toLocaleDateString()}
                                                 </p>
                                             </div>
                                             {!isSelectionMode && (
@@ -208,7 +210,7 @@ export default function CalendarView({
                                                     {todo.title}
                                                 </h4>
                                                 <p className={`text-sm text-gray-600 truncate ${todo.completed ? 'line-through' : ''}`}>
-                                                    {todo.description || "No description"}
+                                                    {todo.description || t('todo.noDescription')}
                                                 </p>
                                             </div>
                                             {!isSelectionMode && (
@@ -237,7 +239,7 @@ export default function CalendarView({
                 {todosByDate['no-date'] && todosByDate['no-date'].length > 0 && (
                     <div>
                         <h3 className="text-lg font-semibold mb-3 text-gray-600 flex items-center gap-2">
-                            📋 No Due Date
+                            {t('dates.noDueDate')}
                         </h3>
                         <div className="space-y-2">
                             {todosByDate['no-date'].map(todo => (
@@ -280,7 +282,7 @@ export default function CalendarView({
                                                 {todo.title}
                                             </h4>
                                             <p className={`text-sm text-gray-600 truncate ${todo.completed ? 'line-through' : ''}`}>
-                                                {todo.description || "No description"}
+                                                {todo.description || t('todo.noDescription')}
                                             </p>
                                         </div>
                                         {!isSelectionMode && (
@@ -309,7 +311,7 @@ export default function CalendarView({
                 {Object.keys(todosByDate).length === 0 && (
                     <div className="text-center py-12 text-gray-500">
                         <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>No todos found</p>
+                        <p>{t('messages.noTodos')}</p>
                     </div>
                 )}
             </div>

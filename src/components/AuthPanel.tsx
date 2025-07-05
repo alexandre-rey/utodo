@@ -7,6 +7,7 @@ import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { sanitizeInput, sanitizeEmail, validatePassword } from "@/utils/sanitize";
+import { useTranslation } from 'react-i18next';
 
 interface AuthPanelProps {
     isOpen: boolean;
@@ -14,6 +15,7 @@ interface AuthPanelProps {
 }
 
 export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
+    const { t } = useTranslation();
     const [isSignIn, setIsSignIn] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -41,11 +43,11 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     email: sanitizedEmail,
                     password: validatedPassword
                 });
-                toast.success("Welcome back!");
+                toast.success(t('auth.signinSuccess'));
             } else {
                 // Sign Up - validate passwords match
                 if (formData.password !== formData.confirmPassword) {
-                    toast.error("Passwords do not match");
+                    toast.error(t('auth.passwordMismatch'));
                     return;
                 }
                 
@@ -55,13 +57,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     firstName: sanitizedFirstName,
                     lastName: sanitizedLastName
                 });
-                toast.success("Account created successfully!");
+                toast.success(t('auth.accountCreated'));
             }
             
             resetForm();
             onClose();
         } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : "Authentication failed";
+            const message = error instanceof Error ? error.message : t('auth.authFailed');
             toast.error(message);
         }
     };
@@ -97,12 +99,12 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <User className="h-5 w-5" />
-                        {isSignIn ? "Sign In" : "Create Account"}
+                        {isSignIn ? t('auth.signIn') : t('auth.createAccount')}
                     </DialogTitle>
                     <DialogDescription>
                         {isSignIn 
-                            ? "Sign in to sync your todos across devices" 
-                            : "Create an account to save your todos in the cloud"
+                            ? t('auth.signInDesc') 
+                            : t('auth.signUpDesc')
                         }
                     </DialogDescription>
                 </DialogHeader>
@@ -112,13 +114,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     {!isSignIn && (
                         <>
                             <div className="space-y-2">
-                                <Label htmlFor="firstName">First Name</Label>
+                                <Label htmlFor="firstName">{t('auth.firstName')}</Label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                                     <Input
                                         id="firstName"
                                         type="text"
-                                        placeholder="Enter your first name"
+                                        placeholder={t('auth.enterFirstName')}
                                         value={formData.firstName}
                                         onChange={(e) => handleInputChange("firstName", e.target.value)}
                                         className="pl-10"
@@ -126,13 +128,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="lastName">Last Name</Label>
+                                <Label htmlFor="lastName">{t('auth.lastName')}</Label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                                     <Input
                                         id="lastName"
                                         type="text"
-                                        placeholder="Enter your last name"
+                                        placeholder={t('auth.enterLastName')}
                                         value={formData.lastName}
                                         onChange={(e) => handleInputChange("lastName", e.target.value)}
                                         className="pl-10"
@@ -144,13 +146,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
 
                     {/* Email field */}
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('auth.email')}</Label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder={t('auth.enterEmail')}
                                 value={formData.email}
                                 onChange={(e) => handleInputChange("email", e.target.value)}
                                 className="pl-10"
@@ -161,13 +163,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
 
                     {/* Password field */}
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('auth.password')}</Label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                             <Input
                                 id="password"
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Enter your password"
+                                placeholder={t('auth.enterPassword')}
                                 value={formData.password}
                                 onChange={(e) => handleInputChange("password", e.target.value)}
                                 className="pl-10 pr-10"
@@ -186,13 +188,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     {/* Confirm Password field - only for sign up */}
                     {!isSignIn && (
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm Password</Label>
+                            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                                 <Input
                                     id="confirmPassword"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Confirm your password"
+                                    placeholder={t('auth.confirmYourPassword')}
                                     value={formData.confirmPassword}
                                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                                     className="pl-10"
@@ -200,7 +202,7 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                                 />
                             </div>
                             {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
-                                <p className="text-sm text-red-600">Passwords do not match</p>
+                                <p className="text-sm text-red-600">{t('auth.passwordMismatch')}</p>
                             )}
                         </div>
                     )}
@@ -211,13 +213,13 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
                         disabled={isLoading}
                     >
-                        {isLoading ? "Please wait..." : (isSignIn ? "Sign In" : "Create Account")}
+                        {isLoading ? t('auth.pleaseWait') : (isSignIn ? t('auth.signIn') : t('auth.createAccount'))}
                     </Button>
 
                     {/* Switch Mode */}
                     <div className="text-center pt-4 border-t">
                         <p className="text-sm text-slate-600">
-                            {isSignIn ? "Don't have an account?" : "Already have an account?"}
+                            {isSignIn ? t('auth.noAccount') : t('auth.hasAccount')}
                         </p>
                         <Button
                             type="button"
@@ -225,14 +227,14 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                             onClick={switchMode}
                             className="text-blue-600 hover:text-blue-700 p-0 h-auto"
                         >
-                            {isSignIn ? "Sign up here" : "Sign in here"}
+                            {isSignIn ? t('auth.signUpHere') : t('auth.signInHere')}
                         </Button>
                     </div>
 
                     {/* Local Mode Note */}
                     <div className="text-center pt-2">
                         <p className="text-xs text-slate-500">
-                            You can also continue using the app locally without an account
+                            {t('auth.localModeNote')}
                         </p>
                     </div>
                 </form>

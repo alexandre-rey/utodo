@@ -5,12 +5,14 @@ import { Card } from "./ui/card";
 import { PlusCircle } from "lucide-react";
 import { sanitizeTodoContent } from "@/utils/sanitize";
 import { toast } from "sonner";
+import { useTranslation } from 'react-i18next';
 
 interface QuickAddProps {
     onAddTodo: (values: { title: string; description: string }) => void;
 }
 
 export default function QuickAdd({ onAddTodo }: QuickAddProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
     const [isExpanded, setIsExpanded] = useState(false);
     const [description, setDescription] = useState("");
@@ -29,7 +31,7 @@ export default function QuickAdd({ onAddTodo }: QuickAddProps) {
                 setIsExpanded(false);
             }
         } catch (error) {
-            const message = error instanceof Error ? error.message : "Invalid input";
+            const message = error instanceof Error ? error.message : t('errors.invalidInput');
             toast.error(message);
         }
     };
@@ -54,7 +56,7 @@ export default function QuickAdd({ onAddTodo }: QuickAddProps) {
                     <div className="flex gap-3">
                         <Input
                             type="text"
-                            placeholder="What needs to be done?"
+                            placeholder={t('placeholders.whatNeedsDone')}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             onKeyDown={handleTitleKeyDown}
@@ -74,7 +76,7 @@ export default function QuickAdd({ onAddTodo }: QuickAddProps) {
                         <div className="animate-in slide-in-from-top-2 duration-200 flex gap-3">
                             <Input
                                 type="text"
-                                placeholder="Add description (optional)..."
+                                placeholder={t('placeholders.addDescriptionOptional')}
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 onKeyDown={(e) => {
@@ -99,7 +101,7 @@ export default function QuickAdd({ onAddTodo }: QuickAddProps) {
                                 }}
                                 className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all duration-200"
                             >
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     )}

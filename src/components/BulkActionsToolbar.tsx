@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Card } from "./ui/card";
 import { CheckSquare, Trash2, X, Tag } from "lucide-react";
 import type { StatusConfig } from "../services/save";
+import { useTranslation } from 'react-i18next';
 
 interface BulkActionsToolbarProps {
     selectedCount: number;
@@ -25,6 +26,7 @@ export default function BulkActionsToolbar({
     statuses,
     allSelected
 }: BulkActionsToolbarProps) {
+    const { t } = useTranslation();
     if (selectedCount === 0) return null;
 
     return (
@@ -33,7 +35,7 @@ export default function BulkActionsToolbar({
                 {/* Selection Info */}
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-slate-700">
-                        {selectedCount} selected
+                        {t('messages.selectedCount', { count: selectedCount })}
                     </span>
                     <Button
                         variant="ghost"
@@ -41,7 +43,7 @@ export default function BulkActionsToolbar({
                         onClick={allSelected ? onClearSelection : onSelectAll}
                         className="text-xs h-6 px-2"
                     >
-                        {allSelected ? "Deselect All" : "Select All"}
+                        {allSelected ? t('actions.deselectAll') : t('actions.selectAll')}
                     </Button>
                 </div>
 
@@ -58,7 +60,7 @@ export default function BulkActionsToolbar({
                         className="flex items-center gap-2 text-green-700 hover:bg-green-50"
                     >
                         <CheckSquare className="h-4 w-4" />
-                        Complete
+                        {t('actions.complete')}
                     </Button>
 
                     {/* Change Status */}
@@ -66,7 +68,7 @@ export default function BulkActionsToolbar({
                         <SelectTrigger className="w-32 h-8 text-xs">
                             <div className="flex items-center gap-2">
                                 <Tag className="h-3 w-3" />
-                                <SelectValue placeholder="Status" />
+                                <SelectValue placeholder={t('actions.status')} />
                             </div>
                         </SelectTrigger>
                         <SelectContent>
@@ -92,7 +94,7 @@ export default function BulkActionsToolbar({
                         className="flex items-center gap-2 text-red-700 hover:bg-red-50"
                     >
                         <Trash2 className="h-4 w-4" />
-                        Delete
+                        {t('actions.delete')}
                     </Button>
                 </div>
 
