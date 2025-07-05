@@ -74,6 +74,14 @@ export function useSubscription() {
     }
   };
 
+  const updateStatusLimitsOptimistically = (countChange: number) => {
+    setStatusLimits(prev => ({
+      ...prev,
+      count: Math.max(0, prev.count + countChange),
+      canCreate: prev.count + countChange < prev.limit
+    }));
+  };
+
   return {
     subscription,
     statusLimits,
@@ -83,6 +91,7 @@ export function useSubscription() {
     createSubscription,
     cancelSubscription,
     reactivateSubscription,
-    refreshData: loadSubscriptionData
+    refreshData: loadSubscriptionData,
+    updateStatusLimitsOptimistically
   };
 }

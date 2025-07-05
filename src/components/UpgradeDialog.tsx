@@ -32,7 +32,7 @@ export default function UpgradeDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   // This would typically come from your Stripe configuration
-  const PREMIUM_PRICE_ID = 'price_premium_monthly'; // Replace with actual Stripe price ID
+  const PREMIUM_PRICE_ID = 'prod_Sciw3hP4PkkysL'; // Replace with actual Stripe price ID
 
   const handleUpgrade = async () => {
     setIsLoading(true);

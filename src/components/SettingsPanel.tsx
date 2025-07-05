@@ -34,24 +34,39 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         canCreateMoreStatuses, 
         createSubscription,
         refreshData: refreshSubscriptionData,
+        updateStatusLimitsOptimistically,
         isLoading: subscriptionLoading 
     } = useSubscription();
     
     // Wrapper function that updates settings and refreshes subscription data
-    const updateSettingsAndRefresh = (newSettings: AppSettings) => {
-        setSettings(newSettings);
-        // Refresh subscription data after settings change
-        refreshSubscriptionData();
+    const updateSettingsAndRefresh = async (newSettings: AppSettings, countChange: number = 0) => {
+        // Optimistically update status limits immediately for consistent UI
+        if (countChange !== 0) {
+            updateStatusLimitsOptimistically(countChange);
+        }
+        
+        try {
+            // Save settings to server FIRST
+            await setSettings(newSettings);
+            // Then refresh subscription data after server confirms the change
+            refreshSubscriptionData();
+        } catch (error) {
+            // If save failed, revert the optimistic update
+            if (countChange !== 0) {
+                updateStatusLimitsOptimistically(-countChange);
+            }
+            throw error;
+        }
     };
 
-    const updateStatus = (id: string, updates: Partial<StatusConfig>) => {
+    const updateStatus = async (id: string, updates: Partial<StatusConfig>) => {
         const newStatuses = settings.statuses.map(status => 
             status.id === id ? { ...status, ...updates } : status
         );
-        updateSettingsAndRefresh({ statuses: newStatuses });
+        await updateSettingsAndRefresh({ statuses: newStatuses });
     };
 
-    const addStatus = () => {
+    const addStatus = async () => {
         // Check if user can create more statuses
         if (!canCreateMoreStatuses) {
             if (isPremium) {
@@ -68,8 +83,12 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
             label: t('todo.newStatus'),
             color: "#e5e7eb"
         };
-        updateSettingsAndRefresh({ statuses: [...settings.statuses, newStatus] });
-        setEditingStatus(newId);
+        try {
+            await updateSettingsAndRefresh({ statuses: [...settings.statuses, newStatus] }, +1);
+            setEditingStatus(newId);
+        } catch {
+            // Error handling is already done in updateSettingsAndRefresh
+        }
     };
 
     const handleUpgrade = async (priceId: string) => {
@@ -81,7 +100,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         }
     };
 
-    const deleteStatus = (id: string) => {
+    const deleteStatus = async (id: string) => {
         if (settings.statuses.length <= 1) return; // Prevent deleting all statuses
         
         const statusToDelete = settings.statuses.find(status => status.id === id);
@@ -90,12 +109,16 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         const canDelete = checkStatusDeletion(id, statusToDelete.label);
         if (canDelete) {
             // Safe to delete immediately - no todos affected
-            updateSettingsAndRefresh({ statuses: settings.statuses.filter(status => status.id !== id) });
+            try {
+                await updateSettingsAndRefresh({ statuses: settings.statuses.filter(status => status.id !== id) }, -1);
+            } catch {
+                // Error handling is already done in updateSettingsAndRefresh
+            }
         }
         // If canDelete is false, the confirmation dialog will be shown
     };
 
-    const moveStatus = (id: string, direction: 'up' | 'down') => {
+    const moveStatus = async (id: string, direction: 'up' | 'down') => {
         const currentIndex = settings.statuses.findIndex(status => status.id === id);
         if (currentIndex === -1) return;
         
@@ -104,10 +127,14 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         
         const newStatuses = [...settings.statuses];
         [newStatuses[currentIndex], newStatuses[newIndex]] = [newStatuses[newIndex], newStatuses[currentIndex]];
-        updateSettingsAndRefresh({ statuses: newStatuses });
+        try {
+            await updateSettingsAndRefresh({ statuses: newStatuses });
+        } catch {
+            // Error handling is already done in updateSettingsAndRefresh
+        }
     };
 
-    const handleConfirmDeletion = (action: 'delete' | 'reassign') => {
+    const handleConfirmDeletion = async (action: 'delete' | 'reassign') => {
         if (!pendingDeletion) return;
 
         // Get the first status from the remaining statuses (excluding the one being deleted)
@@ -117,9 +144,13 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         confirmDeletion(action, firstStatusId);
         
         // Remove the status from settings after handling todos
-        updateSettingsAndRefresh({ 
-            statuses: remainingStatuses
-        });
+        try {
+            await updateSettingsAndRefresh({ 
+                statuses: remainingStatuses
+            }, -1);
+        } catch {
+            // Error handling is already done in updateSettingsAndRefresh
+        }
     };
 
     return (
