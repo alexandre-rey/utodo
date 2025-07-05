@@ -9,9 +9,10 @@ export function useSubscription() {
     plan: 'free'
   });
   const [statusLimits, setStatusLimits] = useState<StatusLimits>({
-    maxCustomStatuses: 3,
-    currentCustomStatuses: 0,
-    canCreateMore: true
+    count: 0,
+    canCreate: true,
+    limit: 3,
+    message: "Loading..."
   });
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -37,7 +38,7 @@ export function useSubscription() {
 
   useEffect(() => {
     loadSubscriptionData();
-  }, [isAuthenticated, authLoading]);
+  }, [isAuthenticated, authLoading]); // loadSubscriptionData is recreated each render, no need to include it
 
   const isPremium = subscriptionService.isPremiumPlan(subscription);
   const canCreateMoreStatuses = subscriptionService.canCreateCustomStatuses(statusLimits);

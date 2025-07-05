@@ -150,7 +150,8 @@ export interface CreateSubscriptionDto {
 }
 
 export interface StatusLimits {
-  maxCustomStatuses: number;
-  currentCustomStatuses: number;
-  canCreateMore: boolean;
+  count: number;
+  canCreate: boolean;
+  limit: number;
+  message: string;
 }

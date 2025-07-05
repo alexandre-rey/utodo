@@ -1,13 +1,18 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Plus, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
+import { Plus, Trash2, ChevronUp, ChevronDown, Star, Lock } from "lucide-react";
 import { useState } from "react";
 import type { StatusConfig, AppSettings } from "../services/save";
 import type { Todo } from "../interfaces/todo.interface";
 import { useStatusDeletion } from "../hooks/useStatusDeletion";
+import { useSubscription } from "../hooks/useSubscription";
 import StatusDeletionConfirmDialog from "./StatusDeletionConfirmDialog";
+import UpgradeDialog from "./UpgradeDialog";
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -21,7 +26,15 @@ interface SettingsPanelProps {
 export default function SettingsPanel({ isOpen, onClose, settings, setSettings, todos, onTodosUpdate }: SettingsPanelProps) {
     const { t } = useTranslation();
     const [editingStatus, setEditingStatus] = useState<string | null>(null);
+    const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const { pendingDeletion, checkStatusDeletion, confirmDeletion, cancelDeletion } = useStatusDeletion(todos, onTodosUpdate);
+    const { 
+        statusLimits, 
+        isPremium, 
+        canCreateMoreStatuses, 
+        createSubscription,
+        isLoading: subscriptionLoading 
+    } = useSubscription();
     
     const updateStatus = (id: string, updates: Partial<StatusConfig>) => {
         const newStatuses = settings.statuses.map(status => 
@@ -31,6 +44,16 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     };
 
     const addStatus = () => {
+        // Check if user can create more statuses
+        if (!canCreateMoreStatuses) {
+            if (isPremium) {
+                toast.error(t('errors.statusLimitReached'));
+            } else {
+                setShowUpgradeDialog(true);
+            }
+            return;
+        }
+
         const newId = `status_${Date.now()}`;
         const newStatus: StatusConfig = {
             id: newId,
@@ -39,6 +62,15 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         };
         setSettings({ statuses: [...settings.statuses, newStatus] });
         setEditingStatus(newId);
+    };
+
+    const handleUpgrade = async (priceId: string) => {
+        try {
+            await createSubscription(priceId);
+            setShowUpgradeDialog(false);
+        } catch {
+            // Error is handled in the hook
+        }
     };
 
     const deleteStatus = (id: string) => {
@@ -91,6 +123,13 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                 onConfirm={handleConfirmDeletion}
                 onCancel={cancelDeletion}
             />
+            <UpgradeDialog
+                isOpen={showUpgradeDialog}
+                onClose={() => setShowUpgradeDialog(false)}
+                onUpgrade={handleUpgrade}
+                currentLimit={statusLimits.limit}
+                currentUsage={statusLimits.count}
+            />
         <Dialog open={isOpen} onOpenChange={(open) => {
             if (!open) {
                 onClose();
@@ -107,12 +146,56 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                 <div className="grid gap-6 py-4 max-h-96 overflow-y-auto">
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">{t('messages.statusColumns')}</h3>
-                            <Button onClick={addStatus} size="sm" variant="outline">
-                                <Plus className="h-4 w-4 mr-1" />
+                            <div className="flex items-center gap-3">
+                                <h3 className="text-lg font-semibold">{t('messages.statusColumns')}</h3>
+                                {isPremium && (
+                                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                                        <Star className="h-3 w-3 mr-1" />
+                                        {t('subscription.premium')}
+                                    </Badge>
+                                )}
+                            </div>
+                            <Button 
+                                onClick={addStatus} 
+                                size="sm" 
+                                variant="outline"
+                                disabled={!canCreateMoreStatuses}
+                            >
+                                {!canCreateMoreStatuses && !isPremium ? (
+                                    <Lock className="h-4 w-4 mr-1" />
+                                ) : (
+                                    <Plus className="h-4 w-4 mr-1" />
+                                )}
                                 {t('messages.addStatus')}
                             </Button>
                         </div>
+
+                        {/* Status limits display */}
+                        {!subscriptionLoading && (
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-medium">
+                                        {t('subscription.statusUsage')}
+                                    </span>
+                                    <span className="text-sm text-gray-600">
+                                        {statusLimits.count} / {
+                                            isPremium ? t('subscription.unlimited') : statusLimits.limit
+                                        }
+                                    </span>
+                                </div>
+                                {!isPremium && (
+                                    <Progress 
+                                        value={(statusLimits.count / statusLimits.limit) * 100} 
+                                        className="h-2"
+                                    />
+                                )}
+                                {!isPremium && !canCreateMoreStatuses && (
+                                    <p className="text-xs text-amber-600 mt-2">
+                                        {t('subscription.limitReachedUpgrade')}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                         
                         <div className="grid gap-3">
                             {settings.statuses.map((status, index) => (

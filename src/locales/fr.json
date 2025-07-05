@@ -132,7 +132,8 @@
     "permissionDenied": "Autorisation refusée",
     "permissionDeniedDesc": "Vous n'avez pas l'autorisation de modifier les paramètres",
     "settingsUpdateFailed": "Échec de l'enregistrement des paramètres",
-    "settingsUpdateFailedDesc": "Vos modifications n'ont pas pu être enregistrées. Veuillez réessayer."
+    "settingsUpdateFailedDesc": "Vos modifications n'ont pas pu être enregistrées. Veuillez réessayer.",
+    "statusLimitReached": "Limite de statuts atteinte"
   },
   "dates": {
     "today": "Aujourd'hui",
@@ -148,5 +149,25 @@
     "description": "📝 Description",
     "priority": "🏷️ Statut de priorité",
     "dueDate": "📅 Date d'échéance"
+  },
+  "subscription": {
+    "premium": "Premium",
+    "unlimited": "Illimité",
+    "statusUsage": "Utilisation des Statuts",
+    "limitReachedUpgrade": "Passez au premium pour des statuts personnalisés illimités",
+    "upgradeToPremium": "Passer au Premium",
+    "statusLimitReached": "Vous avez atteint votre limite de {{limit}} statuts personnalisés.",
+    "premiumPlan": "Plan Premium",
+    "month": "mois",
+    "processing": "Traitement...",
+    "upgradeNow": "Passer au Premium",
+    "upgradeFailed": "Échec de la mise à niveau",
+    "upgradeFailedDesc": "Impossible de traiter votre mise à niveau. Veuillez réessayer.",
+    "feature": {
+      "unlimitedStatuses": "Colonnes de statut personnalisées illimitées",
+      "prioritySupport": "Support client prioritaire",
+      "advancedFeatures": "Fonctionnalités avancées et intégrations",
+      "dataBackup": "Sauvegarde automatique des données"
+    }
   }
 }

@@ -132,7 +132,8 @@
     "permissionDenied": "Permission denied",
     "permissionDeniedDesc": "You do not have permission to modify settings",
     "settingsUpdateFailed": "Failed to save settings",
-    "settingsUpdateFailedDesc": "Your changes could not be saved. Please try again."
+    "settingsUpdateFailedDesc": "Your changes could not be saved. Please try again.",
+    "statusLimitReached": "Status limit reached"
   },
   "dates": {
     "today": "Today",
@@ -148,5 +149,25 @@
     "description": "📝 Description",
     "priority": "🏷️ Priority Status",
     "dueDate": "📅 Due Date"
+  },
+  "subscription": {
+    "premium": "Premium",
+    "unlimited": "Unlimited",
+    "statusUsage": "Status Usage",
+    "limitReachedUpgrade": "Upgrade to premium for unlimited custom statuses",
+    "upgradeToPremium": "Upgrade to Premium",
+    "statusLimitReached": "You've reached your limit of {{limit}} custom statuses.",
+    "premiumPlan": "Premium Plan",
+    "month": "month",
+    "processing": "Processing...",
+    "upgradeNow": "Upgrade Now",
+    "upgradeFailed": "Upgrade failed",
+    "upgradeFailedDesc": "Could not process your upgrade. Please try again.",
+    "feature": {
+      "unlimitedStatuses": "Unlimited custom status columns",
+      "prioritySupport": "Priority customer support",
+      "advancedFeatures": "Advanced features & integrations",
+      "dataBackup": "Automatic data backup"
+    }
   }
 }

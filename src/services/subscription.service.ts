@@ -27,9 +27,10 @@ class SubscriptionService {
     if (!apiClient.isAuthenticated()) {
       // Return default limits for unauthenticated users
       return {
-        maxCustomStatuses: 3,
-        currentCustomStatuses: 0,
-        canCreateMore: true
+        count: 0,
+        canCreate: true,
+        limit: 3,
+        message: "Default limits for local users"
       };
     }
 
@@ -39,9 +40,10 @@ class SubscriptionService {
       console.error('Failed to get status limits:', error);
       // Default limits on error
       return {
-        maxCustomStatuses: 3,
-        currentCustomStatuses: 0,
-        canCreateMore: false
+        count: 0,
+        canCreate: false,
+        limit: 3,
+        message: "Failed to fetch limits"
       };
     }
   }
@@ -65,7 +67,7 @@ class SubscriptionService {
   }
 
   public canCreateCustomStatuses(limits: StatusLimits): boolean {
-    return limits.canCreateMore;
+    return limits.canCreate;
   }
 }
 

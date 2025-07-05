@@ -168,13 +168,13 @@ class SettingsService {
       const newStatusCount = customStatuses.length;
 
       // Check if we're adding more statuses than allowed
-      if (newStatusCount > currentStatusCount && newStatusCount > statusLimits.maxCustomStatuses) {
-        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.maxCustomStatuses} custom statuses. Upgrade to premium for unlimited statuses.`);
+      if (newStatusCount > currentStatusCount && newStatusCount > statusLimits.limit) {
+        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.limit} custom statuses. Upgrade to premium for unlimited statuses.`);
       }
 
       // Check if we're already at the limit and trying to add more
-      if (newStatusCount > statusLimits.maxCustomStatuses) {
-        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.maxCustomStatuses} custom statuses. Upgrade to premium for unlimited statuses.`);
+      if (newStatusCount > statusLimits.limit) {
+        throw new Error(`Status limit exceeded. You can create up to ${statusLimits.limit} custom statuses. Upgrade to premium for unlimited statuses.`);
       }
     } catch (error) {
       // Re-throw limit errors, but don't block on API failures
