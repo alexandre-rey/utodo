@@ -51,8 +51,8 @@ export default function UpgradeDialog({
   const features = [
     t('subscription.feature.unlimitedStatuses'),
     t('subscription.feature.prioritySupport'),
-    t('subscription.feature.advancedFeatures'),
-    t('subscription.feature.dataBackup')
+    //t('subscription.feature.advancedFeatures'),
+    //t('subscription.feature.dataBackup')
   ];
 
   return (
@@ -78,7 +78,7 @@ export default function UpgradeDialog({
               {t('subscription.premiumPlan')}
             </CardTitle>
             <CardDescription className="text-2xl font-bold text-yellow-700">
-              $9.99<span className="text-sm font-normal">/{t('subscription.month')}</span>
+              1.99€ <span className="text-sm font-normal">/{t('subscription.month')}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">

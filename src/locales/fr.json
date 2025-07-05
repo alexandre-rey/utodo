@@ -155,6 +155,7 @@
     "unlimited": "Illimité",
     "statusUsage": "Utilisation des Statuts",
     "limitReachedUpgrade": "Passez au premium pour des statuts personnalisés illimités",
+    "upgradeForMore": "Passer au Premium",
     "upgradeToPremium": "Passer au Premium",
     "statusLimitReached": "Vous avez atteint votre limite de {{limit}} statuts personnalisés.",
     "premiumPlan": "Plan Premium",

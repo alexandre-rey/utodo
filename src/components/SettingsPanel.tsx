@@ -33,14 +33,22 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         isPremium, 
         canCreateMoreStatuses, 
         createSubscription,
+        refreshData: refreshSubscriptionData,
         isLoading: subscriptionLoading 
     } = useSubscription();
     
+    // Wrapper function that updates settings and refreshes subscription data
+    const updateSettingsAndRefresh = (newSettings: AppSettings) => {
+        setSettings(newSettings);
+        // Refresh subscription data after settings change
+        refreshSubscriptionData();
+    };
+
     const updateStatus = (id: string, updates: Partial<StatusConfig>) => {
         const newStatuses = settings.statuses.map(status => 
             status.id === id ? { ...status, ...updates } : status
         );
-        setSettings({ statuses: newStatuses });
+        updateSettingsAndRefresh({ statuses: newStatuses });
     };
 
     const addStatus = () => {
@@ -60,7 +68,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
             label: t('todo.newStatus'),
             color: "#e5e7eb"
         };
-        setSettings({ statuses: [...settings.statuses, newStatus] });
+        updateSettingsAndRefresh({ statuses: [...settings.statuses, newStatus] });
         setEditingStatus(newId);
     };
 
@@ -82,7 +90,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         const canDelete = checkStatusDeletion(id, statusToDelete.label);
         if (canDelete) {
             // Safe to delete immediately - no todos affected
-            setSettings({ statuses: settings.statuses.filter(status => status.id !== id) });
+            updateSettingsAndRefresh({ statuses: settings.statuses.filter(status => status.id !== id) });
         }
         // If canDelete is false, the confirmation dialog will be shown
     };
@@ -96,7 +104,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         
         const newStatuses = [...settings.statuses];
         [newStatuses[currentIndex], newStatuses[newIndex]] = [newStatuses[newIndex], newStatuses[currentIndex]];
-        setSettings({ statuses: newStatuses });
+        updateSettingsAndRefresh({ statuses: newStatuses });
     };
 
     const handleConfirmDeletion = (action: 'delete' | 'reassign') => {
@@ -109,7 +117,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         confirmDeletion(action, firstStatusId);
         
         // Remove the status from settings after handling todos
-        setSettings({ 
+        updateSettingsAndRefresh({ 
             statuses: remainingStatuses
         });
     };
@@ -158,15 +166,16 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                             <Button 
                                 onClick={addStatus} 
                                 size="sm" 
-                                variant="outline"
-                                disabled={!canCreateMoreStatuses}
+                                variant={!canCreateMoreStatuses && !isPremium ? "default" : "outline"}
+                                disabled={isPremium && !canCreateMoreStatuses}
+                                className={!canCreateMoreStatuses && !isPremium ? "bg-yellow-600 hover:bg-yellow-700 text-white" : ""}
                             >
                                 {!canCreateMoreStatuses && !isPremium ? (
                                     <Lock className="h-4 w-4 mr-1" />
                                 ) : (
                                     <Plus className="h-4 w-4 mr-1" />
                                 )}
-                                {t('messages.addStatus')}
+                                {!canCreateMoreStatuses && !isPremium ? t('subscription.upgradeForMore') : t('messages.addStatus')}
                             </Button>
                         </div>
 
