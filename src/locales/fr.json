@@ -169,6 +169,11 @@
       "prioritySupport": "Support client prioritaire",
       "advancedFeatures": "Fonctionnalités avancées et intégrations",
       "dataBackup": "Sauvegarde automatique des données"
-    }
+    },
+    "completePayment": "Finaliser le paiement",
+    "paymentFailed": "Échec du paiement",
+    "paymentSuccess": "Paiement réussi",
+    "payNow": "Payer maintenant",
+    "upgradeSuccess": "Mise à niveau réussie"
   }
 }

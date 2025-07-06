@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { subscriptionService } from '@/services/subscription.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { type SubscriptionStatus, type StatusLimits } from '@/types/api';
+import { loadStripe } from '@stripe/stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 
 export function useSubscription() {
   const [subscription, setSubscription] = useState<SubscriptionStatus>({
@@ -45,8 +47,24 @@ export function useSubscription() {
 
   const createSubscription = async (priceId: string) => {
     try {
-      const { clientSecret, subscriptionId } = await subscriptionService.createSubscription(priceId);
-      // TODO: Implement Stripe Element
+      const response = await subscriptionService.createSubscription(priceId);
+      const { clientSecret, subscriptionId } = response;
+      
+      if (!clientSecret) {
+        throw new Error('Backend did not return clientSecret');
+      }
+      
+      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '') as Stripe | null;
+      
+      if (!stripe) {
+        throw new Error('Failed to load Stripe - check your publishable key');
+      }
+      
+      return {
+        clientSecret,
+        subscriptionId,
+        stripe
+      };
     } catch (error) {
       console.error('Failed to create subscription:', error);
       throw error;

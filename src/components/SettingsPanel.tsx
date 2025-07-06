@@ -92,12 +92,9 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     };
 
     const handleUpgrade = async (priceId: string) => {
-        try {
-            await createSubscription(priceId);
-            setShowUpgradeDialog(false);
-        } catch {
-            // Error is handled in the hook
-        }
+        const result = await createSubscription(priceId);
+        setShowUpgradeDialog(false);
+        return result;
     };
 
     const deleteStatus = async (id: string) => {

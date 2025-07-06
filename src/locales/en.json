@@ -169,6 +169,11 @@
       "prioritySupport": "Priority customer support",
       "advancedFeatures": "Advanced features & integrations",
       "dataBackup": "Automatic data backup"
-    }
+    },
+    "completePayment": "Complete Payment",
+    "paymentFailed": "Payment Failed",
+    "paymentSuccess": "Payment Successful",
+    "payNow": "Pay Now",
+    "upgradeSuccess": "Upgrade Successful"
   }
 }
