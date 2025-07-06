@@ -45,9 +45,8 @@ export function useSubscription() {
 
   const createSubscription = async (priceId: string) => {
     try {
-      const { url } = await subscriptionService.createSubscription(priceId);
-      // Redirect to Stripe checkout
-      window.location.href = url;
+      const { clientSecret, subscriptionId } = await subscriptionService.createSubscription(priceId);
+      // TODO: Implement Stripe Element
     } catch (error) {
       console.error('Failed to create subscription:', error);
       throw error;

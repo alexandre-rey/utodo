@@ -48,9 +48,9 @@ class SubscriptionService {
     }
   }
 
-  public async createSubscription(priceId: string): Promise<{ url: string }> {
+  public async createSubscription(priceId: string): Promise<{ clientSecret: string, subscriptionId: string }> {
     const createDto: CreateSubscriptionDto = { priceId };
-    return await apiClient.post<{ url: string }>('/subscription', createDto);
+    return await apiClient.post<{ clientSecret: string, subscriptionId: string }>('/subscription', createDto);
   }
 
   public async cancelSubscription(): Promise<void> {
