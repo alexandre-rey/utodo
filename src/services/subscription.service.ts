@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { type SubscriptionStatus, type CreateSubscriptionDto, type StatusLimits } from '@/types/api';
+import { type SubscriptionStatus, type CreateSubscriptionDto, type CreateSubscriptionResponse, type StatusLimits } from '@/types/api';
 
 class SubscriptionService {
   public async getSubscriptionStatus(): Promise<SubscriptionStatus> {
@@ -48,9 +48,9 @@ class SubscriptionService {
     }
   }
 
-  public async createSubscription(priceId: string): Promise<{ url: string }> {
-    const createDto: CreateSubscriptionDto = { priceId };
-    return await apiClient.post<{ url: string }>('/subscription', createDto);
+  public async createSubscription(priceId: string, paymentMethodId?: string): Promise<CreateSubscriptionResponse> {
+    const createDto: CreateSubscriptionDto = { priceId, paymentMethodId };
+    return await apiClient.post<CreateSubscriptionResponse>('/subscription', createDto);
   }
 
   public async cancelSubscription(): Promise<void> {

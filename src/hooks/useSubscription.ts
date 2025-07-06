@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { subscriptionService } from '@/services/subscription.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { type SubscriptionStatus, type StatusLimits } from '@/types/api';
@@ -17,7 +17,7 @@ export function useSubscription() {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const loadSubscriptionData = async () => {
+  const loadSubscriptionData = useCallback(async () => {
     if (authLoading) return;
     
     setIsLoading(true);
@@ -34,20 +34,29 @@ export function useSubscription() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [authLoading]);
 
   useEffect(() => {
     loadSubscriptionData();
-  }, [isAuthenticated, authLoading]); // loadSubscriptionData is recreated each render, no need to include it
+  }, [isAuthenticated, authLoading, loadSubscriptionData]);
 
   const isPremium = subscriptionService.isPremiumPlan(subscription);
   const canCreateMoreStatuses = subscriptionService.canCreateCustomStatuses(statusLimits);
 
-  const createSubscription = async (priceId: string) => {
+  const createSubscription = async (priceId: string, paymentMethodId?: string) => {
     try {
-      const { url } = await subscriptionService.createSubscription(priceId);
-      // Redirect to Stripe checkout
-      window.location.href = url;
+      const { clientSecret, subscriptionId } = await subscriptionService.createSubscription(priceId, paymentMethodId);
+      
+      if (paymentMethodId) {
+        // Payment method provided, subscription should be created and confirmed
+        console.log('Subscription created with payment method:', { subscriptionId });
+        // Refresh subscription data to get updated status
+        await loadSubscriptionData();
+        return { success: true, subscriptionId };
+      } else {
+        // Return client secret for manual payment confirmation
+        return { clientSecret, subscriptionId };
+      }
     } catch (error) {
       console.error('Failed to create subscription:', error);
       throw error;

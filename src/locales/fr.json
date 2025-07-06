@@ -164,6 +164,10 @@
     "upgradeNow": "Passer au Premium",
     "upgradeFailed": "Échec de la mise à niveau",
     "upgradeFailedDesc": "Impossible de traiter votre mise à niveau. Veuillez réessayer.",
+    "upgradeSuccess": "Mise à niveau réussie !",
+    "upgradeSuccessDesc": "Vous avez maintenant accès aux fonctionnalités premium.",
+    "paymentFailed": "Échec du paiement",
+    "paymentDetails": "Détails du Paiement",
     "feature": {
       "unlimitedStatuses": "Colonnes de statut personnalisées illimitées",
       "prioritySupport": "Support client prioritaire",

@@ -23,9 +23,7 @@ export function useTodos() {
         }
         
         const remainingResponses = await Promise.all(remainingPages);
-        remainingResponses.forEach(response => {
-          allTodos.push(...response.data);
-        });
+        allTodos = allTodos.concat(...remainingResponses.map(response => response.data));
       }
       
       // Transform the todos to match the frontend interface

@@ -147,6 +147,12 @@ export interface SubscriptionStatus {
 
 export interface CreateSubscriptionDto {
   priceId: string;
+  paymentMethodId?: string;
+}
+
+export interface CreateSubscriptionResponse {
+  clientSecret: string;
+  subscriptionId: string;
 }
 
 export interface StatusLimits {

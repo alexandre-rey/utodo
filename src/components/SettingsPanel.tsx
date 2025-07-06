@@ -18,7 +18,7 @@ interface SettingsPanelProps {
     isOpen: boolean;
     onClose: () => void;
     settings: AppSettings;
-    setSettings: (settings: AppSettings) => void;
+    setSettings: (settings: AppSettings) => Promise<void>;
     todos: Todo[];
     onTodosUpdate: (todos: Todo[]) => void;
 }
@@ -91,10 +91,15 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         }
     };
 
-    const handleUpgrade = async (priceId: string) => {
+    const handleUpgrade = async (priceId: string, paymentMethodId?: string) => {
         try {
-            await createSubscription(priceId);
-            setShowUpgradeDialog(false);
+            const result = await createSubscription(priceId, paymentMethodId);
+            if (result?.success) {
+                setShowUpgradeDialog(false);
+                toast.success(t('subscription.upgradeSuccess'), {
+                    description: t('subscription.upgradeSuccessDesc')
+                });
+            }
         } catch {
             // Error is handled in the hook
         }

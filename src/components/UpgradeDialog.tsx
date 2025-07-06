@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {
   Dialog,
   DialogContent,
@@ -11,14 +13,111 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Star } from 'lucide-react';
+import { Check, Star, CreditCard } from 'lucide-react';
+
+// Initialize Stripe
+//const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RhTQ1IMIipJaxZMBz2dlVyC5Fx75JRaqgk8ece6o3TQd5G8m1AIf2Ui2TRiVjp0uk4szgRPCk9zwnDfw3IF77jA00Z44lM1A6');
 
 interface UpgradeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpgrade: (priceId: string) => Promise<void>;
+  onUpgrade: (priceId: string, paymentMethodId?: string) => Promise<void>;
   currentLimit: number;
   currentUsage: number;
+}
+
+// Payment Form Component
+function PaymentForm({ 
+  onUpgrade, 
+  priceId, 
+  isLoading, 
+  setIsLoading 
+}: { 
+  onUpgrade: (priceId: string, paymentMethodId?: string) => Promise<void>;
+  priceId: string;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
+}) {
+  const { t } = useTranslation();
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const cardElement = elements.getElement(CardElement);
+    if (!cardElement) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // Create payment method
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (error) {
+        console.error('Payment method creation failed:', error);
+        toast.error(t('subscription.paymentFailed'), {
+          description: error.message
+        });
+        return;
+      }
+
+      // Call the upgrade function with payment method
+      await onUpgrade(priceId, paymentMethod.id);
+
+    } catch (error) {
+      console.error('Payment failed:', error);
+      toast.error(t('subscription.upgradeFailed'), {
+        description: t('subscription.upgradeFailedDesc')
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="p-4 border rounded-lg">
+        <div className="flex items-center gap-2 mb-3">
+          <CreditCard className="h-4 w-4" />
+          <span className="text-sm font-medium">{t('subscription.paymentDetails')}</span>
+        </div>
+        <CardElement
+          options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#424770',
+                '::placeholder': {
+                  color: '#aab7c4',
+                },
+              },
+              invalid: {
+                color: '#9e2146',
+              },
+            },
+          }}
+        />
+      </div>
+      <Button 
+        type="submit" 
+        disabled={!stripe || isLoading}
+        className="w-full bg-yellow-600 hover:bg-yellow-700"
+      >
+        {isLoading ? t('subscription.processing') : t('subscription.upgradeNow')}
+      </Button>
+    </form>
+  );
 }
 
 export default function UpgradeDialog({ 
@@ -33,20 +132,6 @@ export default function UpgradeDialog({
 
   // This would typically come from your Stripe configuration
   const PREMIUM_PRICE_ID = 'prod_Sciw3hP4PkkysL'; // Replace with actual Stripe price ID
-
-  const handleUpgrade = async () => {
-    setIsLoading(true);
-    try {
-      await onUpgrade(PREMIUM_PRICE_ID);
-    } catch (error) {
-      console.error('Upgrade failed:', error);
-      toast.error(t('subscription.upgradeFailed'), {
-        description: t('subscription.upgradeFailedDesc')
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const features = [
     t('subscription.feature.unlimitedStatuses'),
@@ -93,16 +178,11 @@ export default function UpgradeDialog({
           </CardContent>
         </Card>
 
+
+
         <DialogFooter className="gap-2 sm:gap-0">
           <Button variant="outline" onClick={onClose}>
             {t('actions.cancel')}
-          </Button>
-          <Button 
-            onClick={handleUpgrade} 
-            disabled={isLoading}
-            className="bg-yellow-600 hover:bg-yellow-700"
-          >
-            {isLoading ? t('subscription.processing') : t('subscription.upgradeNow')}
           </Button>
         </DialogFooter>
       </DialogContent>
