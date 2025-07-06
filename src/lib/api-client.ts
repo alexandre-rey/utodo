@@ -1,5 +1,5 @@
 import { type ApiError } from '@/types/api';
-import { CookieAuth, CSRFProtection } from '@/utils/cookieAuth';
+import { CookieAuth } from '@/utils/cookieAuth';
 
 class ApiClient {
   private baseURL: string;
