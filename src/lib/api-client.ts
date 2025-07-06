@@ -112,8 +112,8 @@ class ApiClient {
       ...options.headers,
     };
 
-    // Add CSRF protection for cookie-based auth
-    headers = CSRFProtection.addToHeaders(headers as Record<string, string>);
+    // Add CSRF protection for cookie-based auth (disabled for dev due to CORS)
+    // headers = CSRFProtection.addToHeaders(headers as Record<string, string>);
 
     if (this.accessToken) {
       headers = {

@@ -32,7 +32,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         statusLimits, 
         isPremium, 
         canCreateMoreStatuses, 
-        createSubscription,
+        createCheckoutSession,
         refreshData: refreshSubscriptionData,
         updateStatusLimitsOptimistically,
         isLoading: subscriptionLoading 
@@ -92,9 +92,9 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     };
 
     const handleUpgrade = async (priceId: string) => {
-        const result = await createSubscription(priceId);
+        await createCheckoutSession(priceId);
+        // User will be redirected to Stripe Checkout
         setShowUpgradeDialog(false);
-        return result;
     };
 
     const deleteStatus = async (id: string) => {

@@ -53,6 +53,11 @@ class SubscriptionService {
     return await apiClient.post<{ clientSecret: string, subscriptionId: string }>('/subscription', createDto);
   }
 
+  public async createCheckoutSession(priceId: string): Promise<{ checkoutUrl: string }> {
+    const createDto: CreateSubscriptionDto = { priceId };
+    return await apiClient.post<{ checkoutUrl: string }>('/subscription/checkout', createDto);
+  }
+
   public async cancelSubscription(): Promise<void> {
     await apiClient.delete('/subscription');
   }

@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { subscriptionService } from '@/services/subscription.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { type SubscriptionStatus, type StatusLimits } from '@/types/api';
-import { loadStripe } from '@stripe/stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
 
 export function useSubscription() {
   const [subscription, setSubscription] = useState<SubscriptionStatus>({
@@ -45,28 +43,19 @@ export function useSubscription() {
   const isPremium = subscriptionService.isPremiumPlan(subscription);
   const canCreateMoreStatuses = subscriptionService.canCreateCustomStatuses(statusLimits);
 
-  const createSubscription = async (priceId: string) => {
+  const createCheckoutSession = async (priceId: string) => {
     try {
-      const response = await subscriptionService.createSubscription(priceId);
-      const { clientSecret, subscriptionId } = response;
+      const response = await subscriptionService.createCheckoutSession(priceId);
+      const { checkoutUrl } = response;
       
-      if (!clientSecret) {
-        throw new Error('Backend did not return clientSecret');
+      if (!checkoutUrl) {
+        throw new Error('Backend did not return checkout URL');
       }
       
-      const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '') as Stripe | null;
-      
-      if (!stripe) {
-        throw new Error('Failed to load Stripe - check your publishable key');
-      }
-      
-      return {
-        clientSecret,
-        subscriptionId,
-        stripe
-      };
+      // Redirect to Stripe Checkout
+      window.location.href = checkoutUrl;
     } catch (error) {
-      console.error('Failed to create subscription:', error);
+      console.error('Failed to create checkout session:', error);
       throw error;
     }
   };
@@ -105,7 +94,7 @@ export function useSubscription() {
     isLoading,
     isPremium,
     canCreateMoreStatuses,
-    createSubscription,
+    createCheckoutSession,
     cancelSubscription,
     reactivateSubscription,
     refreshData: loadSubscriptionData,

@@ -16,10 +16,6 @@ import { useAuth } from "./hooks/useAuth";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useTodoFilters } from "./hooks/useTodoFilters";
 import type { Todo } from "./interfaces/todo.interface";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
 
 
 export default function App() {
@@ -74,8 +70,7 @@ export default function App() {
   return (
     <>
       <Toaster />
-      <Elements stripe={stripePromise}>
-        <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-x-auto">
+      <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-x-auto">
         <AppHeader
           viewMode={viewMode}
           setViewMode={setViewMode}
@@ -152,8 +147,7 @@ export default function App() {
           statuses={settings.statuses}
           allSelected={allVisibleSelected(selectedTodos)}
         />
-        </div>
-      </Elements>
+      </div>
     </>
   )
 }
