@@ -58,6 +58,6 @@ function PaymentSuccess() {
   )
 }
 
-export const Route = createFileRoute('/payment-success' as any)({
+export const Route = createFileRoute('/payment-success')({
   component: PaymentSuccess,
 })

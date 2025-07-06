@@ -13,6 +13,7 @@ import StatusDeletionConfirmDialog from "./StatusDeletionConfirmDialog";
 import UpgradeDialog from "./UpgradeDialog";
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import SubscriptionManagement from './SubscriptionManagement';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -180,6 +181,9 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                 </DialogHeader>
                 
                 <div className="grid gap-6 py-4 max-h-96 overflow-y-auto">
+                    {/* Subscription Management Section */}
+                    <SubscriptionManagement />
+                    
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

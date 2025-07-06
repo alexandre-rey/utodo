@@ -9,6 +9,7 @@ import AuthPanel from "./components/AuthPanel";
 import BulkActionsToolbar from "./components/BulkActionsToolbar";
 import AppHeader from "./components/AppHeader";
 import SearchBar from "./components/SearchBar";
+import Footer from "./components/Footer";
 import { useTodos } from "./hooks/useTodos";
 import { useBulkActions } from "./hooks/useBulkActions";
 import { useSettings } from "./hooks/useSettings";
@@ -147,6 +148,8 @@ export default function App() {
           statuses={settings.statuses}
           allSelected={allVisibleSelected(selectedTodos)}
         />
+        
+        <Footer />
       </div>
     </>
   )

@@ -58,6 +58,6 @@ function PaymentCancelled() {
   )
 }
 
-export const Route = createFileRoute('/payment-cancelled' as any)({
+export const Route = createFileRoute('/payment-cancelled')({
   component: PaymentCancelled,
 })

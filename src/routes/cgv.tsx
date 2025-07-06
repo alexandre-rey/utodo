@@ -1,0 +1,119 @@
+import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArrowLeft, ShoppingCart } from 'lucide-react'
+
+function CGV() {
+  const { t } = useTranslation()
+
+  const handleGoBack = () => {
+    window.location.href = '/'
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <Button 
+            variant="outline"
+            onClick={handleGoBack}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            {t('actions.back')}
+          </Button>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl flex items-center gap-3">
+              <ShoppingCart className="h-8 w-8 text-green-600" />
+              {t('legal.cgv.title')}
+            </CardTitle>
+            <p className="text-gray-600">
+              {t('legal.cgv.lastUpdated')}: {new Date().toLocaleDateString()}
+            </p>
+          </CardHeader>
+          <CardContent className="prose max-w-none">
+            <div className="space-y-6">
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section1.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section1.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section2.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section2.content')}
+                </p>
+                <ul className="list-disc ml-6 mt-3 space-y-1">
+                  <li>{t('legal.cgv.section2.item1')}</li>
+                  <li>{t('legal.cgv.section2.item2')}</li>
+                  <li>{t('legal.cgv.section2.item3')}</li>
+                </ul>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section3.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section3.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section4.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section4.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section5.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section5.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section6.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section6.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section7.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section7.content')}
+                </p>
+              </section>
+
+              <section>
+                <h2 className="text-xl font-semibold mb-3">{t('legal.cgv.section8.title')}</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {t('legal.cgv.section8.content')}
+                </p>
+              </section>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-8">
+                <p className="text-sm text-green-800">
+                  <strong>{t('legal.contact.title')}:</strong> {t('legal.contact.email')}
+                </p>
+                <p className="text-sm text-green-800 mt-1">
+                  <strong>{t('legal.contact.supportHours')}:</strong> {t('legal.contact.hours')}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
+
+export const Route = createFileRoute('/cgv')({
+  component: CGV,
+})
