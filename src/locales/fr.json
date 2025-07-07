@@ -82,7 +82,13 @@
     "selected": "sélectionné(e)s",
     "status": "Statut",
     "statusColon": "Statut :",
-    "back": "Retour"
+    "back": "Retour",
+    "markComplete": "Marquer comme terminé",
+    "markIncomplete": "Marquer comme non terminé",
+    "move": "Déplacer",
+    "addNew": "Ajouter nouveau",
+    "changed": "Modifié",
+    "undo": "Annuler"
   },
   "dialogs": {
     "addTodo": "Ajouter une tâche",
@@ -227,16 +233,6 @@
     "andMore": "+ {{count}} de plus",
     "noTodos": "Aucune tâche",
     "noTodosInStatus": "Aucune tâche dans {{status}}"
-  },
-  "actions": {
-    "markComplete": "Marquer comme terminé",
-    "markIncomplete": "Marquer comme non terminé",
-    "move": "Déplacer",
-    "delete": "Supprimer",
-    "addNew": "Ajouter nouveau",
-    "changed": "Modifié",
-    "undo": "Annuler",
-    "selected": "sélectionné(s)"
   },
   "legal": {
     "contact": {

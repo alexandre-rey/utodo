@@ -7,7 +7,8 @@ import {
   LogOut, 
   Eye, 
   EyeOff,
-  Search
+  Search,
+  Languages
 } from 'lucide-react';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';

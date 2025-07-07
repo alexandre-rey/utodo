@@ -82,7 +82,13 @@
     "selected": "selected",
     "status": "Status",
     "statusColon": "Status:",
-    "back": "Back"
+    "back": "Back",
+    "markComplete": "Mark complete",
+    "markIncomplete": "Mark incomplete",
+    "move": "Move",
+    "addNew": "Add new",
+    "changed": "Changed",
+    "undo": "Undo"
   },
   "dialogs": {
     "addTodo": "Add Todo",
@@ -227,16 +233,6 @@
     "andMore": "+ {{count}} more",
     "noTodos": "No todos",
     "noTodosInStatus": "No todos in {{status}}"
-  },
-  "actions": {
-    "markComplete": "Mark complete",
-    "markIncomplete": "Mark incomplete",
-    "move": "Move",
-    "delete": "Delete",
-    "addNew": "Add new",
-    "changed": "Changed",
-    "undo": "Undo",
-    "selected": "selected"
   },
   "legal": {
     "contact": {

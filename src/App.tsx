@@ -74,7 +74,7 @@ export default function App() {
   return (
     <>
       <Toaster />
-      <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-x-auto">
+      <div className={`flex flex-col justify-start min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-x-auto ${!isMobile ? 'items-center' : ''}`}>
         {!isMobile && (
           <>
             <AppHeader
