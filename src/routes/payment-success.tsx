@@ -18,7 +18,7 @@ function PaymentSuccess() {
     })
 
     // You could verify the payment with your backend here using session_id
-    console.log('Payment successful, session_id:', session_id)
+    console.warn('Payment successful, session_id:', session_id)
   }, [session_id, t])
 
   const handleContinue = () => {

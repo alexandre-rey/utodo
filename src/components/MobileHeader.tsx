@@ -39,7 +39,7 @@ export default function MobileHeader({
   onSignOut,
   onOpenSearch
 }: MobileHeaderProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleMenuToggle = () => {
@@ -49,6 +49,12 @@ export default function MobileHeader({
   const handleMenuAction = (action: () => void) => {
     action();
     setShowMenu(false);
+  };
+
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'en' ? 'fr' : 'en';
+    i18n.changeLanguage(newLang);
+    localStorage.setItem('language', newLang);
   };
 
   return (
@@ -146,6 +152,15 @@ export default function MobileHeader({
                     <Eye className="h-4 w-4 mr-3" />
                   )}
                   {showCompleted ? t('navigation.hideCompleted') : t('navigation.showCompleted')}
+                </button>
+
+                {/* Language Switcher */}
+                <button
+                  onClick={() => handleMenuAction(toggleLanguage)}
+                  className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-gray-200"
+                >
+                  <Languages className="h-4 w-4 mr-3" />
+                  {i18n.language === 'en' ? 'Français' : 'English'}
                 </button>
 
                 {/* Settings */}

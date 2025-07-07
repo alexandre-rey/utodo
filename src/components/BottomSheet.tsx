@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Minus } from 'lucide-react';
 import { Button } from './ui/button';
@@ -110,7 +110,7 @@ export default function BottomSheet({
     });
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging || !dragStart || !sheetRef.current) return;
 
     const deltaY = e.clientY - dragStart.y;
@@ -119,9 +119,9 @@ export default function BottomSheet({
     const newHeight = Math.max(10, Math.min(95, dragStart.height - deltaPercentage));
     
     sheetRef.current.style.height = `${newHeight}vh`;
-  };
+  }, [isDragging, dragStart]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (!isDragging || !sheetRef.current) return;
 
     setIsDragging(false);
@@ -147,7 +147,7 @@ export default function BottomSheet({
 
     setCurrentSnapPoint(closestSnapIndex);
     sheetRef.current.style.height = `${snapPoints[closestSnapIndex]}vh`;
-  };
+  }, [isDragging, snapPoints, onClose]);
 
   useEffect(() => {
     if (isDragging) {
@@ -158,7 +158,7 @@ export default function BottomSheet({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDragging, dragStart]);
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   // Handle overlay click
   const handleOverlayClick = (e: React.MouseEvent) => {

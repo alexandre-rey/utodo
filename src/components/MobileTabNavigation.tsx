@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -60,7 +60,7 @@ export default function MobileTabNavigation({
   };
 
   // Scroll active tab into view
-  const scrollToActiveTab = () => {
+  const scrollToActiveTab = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
@@ -77,12 +77,12 @@ export default function MobileTabNavigation({
         inline: 'center'
       });
     }
-  };
+  }, [activeTab]);
 
   useEffect(() => {
     handleScroll();
     scrollToActiveTab();
-  }, [activeTab]);
+  }, [activeTab, scrollToActiveTab]);
 
   useEffect(() => {
     const container = scrollContainerRef.current;

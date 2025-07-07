@@ -40,7 +40,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     } = useSubscription();
     
     // Wrapper function that updates settings and refreshes subscription data
-    const updateSettingsAndRefresh = async (newSettings: AppSettings, countChange: number = 0) => {
+    const updateSettingsAndRefresh = async (newSettings: AppSettings, countChange = 0) => {
         // Optimistically update status limits immediately for consistent UI
         if (countChange !== 0) {
             updateStatusLimitsOptimistically(countChange);

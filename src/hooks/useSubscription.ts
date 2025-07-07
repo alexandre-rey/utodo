@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { subscriptionService } from '@/services/subscription.service';
 import { useAuth } from '@/contexts/AuthContext';
 import { type SubscriptionStatus, type StatusLimits } from '@/types/api';
@@ -17,7 +17,7 @@ export function useSubscription() {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const loadSubscriptionData = async () => {
+  const loadSubscriptionData = useCallback(async () => {
     if (authLoading) return;
     
     setIsLoading(true);
@@ -34,11 +34,11 @@ export function useSubscription() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [authLoading]);
 
   useEffect(() => {
     loadSubscriptionData();
-  }, [isAuthenticated, authLoading]); // loadSubscriptionData is recreated each render, no need to include it
+  }, [isAuthenticated, authLoading, loadSubscriptionData]);
 
   const isPremium = subscriptionService.isPremiumPlan(subscription);
   const canCreateMoreStatuses = subscriptionService.canCreateCustomStatuses(statusLimits);
