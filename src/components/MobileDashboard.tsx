@@ -27,17 +27,17 @@ export default function MobileDashboard({
 
   // Calculate stats
   const totalTodos = todos.length;
-  const completedTodos = todos.filter(todo => todo.isCompleted).length;
+  const completedTodos = todos.filter(todo => todo.completed).length;
   const todayCompletedCount = todos.filter(todo => {
     const today = new Date().toDateString();
     const updatedDate = new Date(todo.updatedAt).toDateString();
-    return todo.isCompleted && updatedDate === today;
+    return todo.completed && updatedDate === today;
   }).length;
 
   // Get todos by status
   const getTodosByStatus = (statusId: string) => {
     return todos.filter(todo => {
-      if (!showCompleted && todo.isCompleted) return false;
+      if (!showCompleted && todo.completed) return false;
       return todo.status === statusId;
     });
   };
@@ -45,7 +45,7 @@ export default function MobileDashboard({
   // Get preview todos (first 2 non-completed)
   const getPreviewTodos = (statusId: string) => {
     return getTodosByStatus(statusId)
-      .filter(todo => !todo.isCompleted)
+      .filter(todo => !todo.completed)
       .slice(0, 2);
   };
 

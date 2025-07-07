@@ -251,7 +251,7 @@ export default function MobileView({
                   <div>
                     <span className="text-gray-500">{t('todo.completed')}:</span>
                     <p className="font-medium">
-                      {selectedTodo.isCompleted ? t('common.yes') : t('common.no')}
+                      {selectedTodo.completed ? t('common.yes') : t('common.no')}
                     </p>
                   </div>
                   {selectedTodo.dueDate && (
@@ -294,7 +294,7 @@ export default function MobileView({
                   handleTodoStatusChangeWithFeedback(selectedTodo.id, nextStatus.id);
                 }
               }}
-              isCompleted={selectedTodo.isCompleted}
+              isCompleted={selectedTodo.completed}
             />
           </>
         )}

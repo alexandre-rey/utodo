@@ -28,7 +28,7 @@ export default function MobileTabNavigation({
   // Calculate todo count for each status
   const getTodoCount = (statusId: string) => {
     return todos.filter(todo => {
-      if (!showCompleted && todo.isCompleted) return false;
+      if (!showCompleted && todo.completed) return false;
       return todo.status === statusId;
     }).length;
   };

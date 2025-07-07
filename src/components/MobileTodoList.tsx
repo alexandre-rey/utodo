@@ -44,7 +44,7 @@ export default function MobileTodoList({
 
   // Filter todos for this status
   const filteredTodos = todos.filter(todo => {
-    if (!showCompleted && todo.isCompleted) return false;
+    if (!showCompleted && todo.completed) return false;
     return todo.status === status.id;
   });
 
@@ -133,7 +133,7 @@ export default function MobileTodoList({
       <div className="space-y-3">
         {filteredTodos.map((todo) => {
           const isSelected = selectedTodos.has(todo.id);
-          const isOverdue = Boolean(todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.isCompleted);
+          const isOverdue = Boolean(todo.dueDate && new Date(todo.dueDate) < new Date() && !todo.completed);
 
           return (
             <Card
@@ -173,7 +173,7 @@ export default function MobileTodoList({
                         onTodoCompletionToggle(todo.id);
                       }}
                     >
-                      {todo.isCompleted ? (
+                      {todo.completed ? (
                         <CheckCircle className="w-5 h-5 text-green-500" />
                       ) : (
                         <Circle className="w-5 h-5 text-gray-400" />
@@ -187,7 +187,7 @@ export default function MobileTodoList({
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <h4 className={`font-medium text-gray-900 leading-5 ${
-                        todo.isCompleted ? 'line-through text-gray-500' : ''
+                        todo.completed ? 'line-through text-gray-500' : ''
                       }`}>
                         {todo.title}
                       </h4>

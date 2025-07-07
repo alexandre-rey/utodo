@@ -23,6 +23,7 @@ export default function SimpleMobileView() {
   
   // Use contexts instead of props
   const {
+    todos,
     visibleTodos,
     completedCount,
     handleAddTodo,
@@ -42,19 +43,19 @@ export default function SimpleMobileView() {
     setIsAuthOpen 
   } = useAppUIContext();
 
-  // Calculate stats
-  const totalTodos = visibleTodos.length;
-  const completedTodos = visibleTodos.filter(todo => todo.isCompleted).length;
-  const todayCompletedCount = visibleTodos.filter(todo => {
+  // Calculate stats - use all todos for progress, not just visible ones
+  const totalTodos = todos.length;
+  const completedTodos = todos.filter(todo => todo.completed).length;
+  const todayCompletedCount = todos.filter(todo => {
     const today = new Date().toDateString();
     const updatedDate = new Date(todo.updatedAt).toDateString();
-    return todo.isCompleted && updatedDate === today;
+    return todo.completed && updatedDate === today;
   }).length;
 
   // Get todos by status
   const getTodosByStatus = (statusId: string) => {
     return visibleTodos.filter(todo => {
-      if (!showCompleted && todo.isCompleted) return false;
+      if (!showCompleted && todo.completed) return false;
       return todo.status === statusId;
     });
   };
@@ -224,13 +225,13 @@ export default function SimpleMobileView() {
                     >
                       <input
                         type="checkbox"
-                        checked={todo.isCompleted}
+                        checked={todo.completed}
                         readOnly
                         className="mt-1 mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded pointer-events-none"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-medium ${todo.isCompleted ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                      <h3 className={`font-medium ${todo.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                         {todo.title}
                       </h3>
                       {todo.description && (
