@@ -20,7 +20,7 @@ interface MobileViewProps {
   onTodoStatusChange: (todoId: string, newStatus: string) => void;
   onTodoCompletionToggle: (todoId: string) => void;
   onTodoClick: (todo: Todo) => void;
-  onAddTodo: () => void;
+  onAddTodo: (values: { title: string; description: string }) => void;
   showCompleted: boolean;
   onToggleCompleted: () => void;
   isSelectionMode: boolean;
@@ -162,12 +162,6 @@ export default function MobileView({
             onAddTodo={onAddTodo}
             showCompleted={showCompleted}
           />
-          
-          {/* Dashboard FAB */}
-          <FloatingActionButton
-            mode="add"
-            onAddTodo={onAddTodo}
-          />
         </>
       )}
 
@@ -228,7 +222,7 @@ export default function MobileView({
             ) : (
               <FloatingActionButton
                 mode="add"
-                onAddTodo={onAddTodo}
+                onAddTodo={() => {}} // AddDialog is now handled in MobileDashboard
               />
             )}
           </>
@@ -293,7 +287,7 @@ export default function MobileView({
             {/* Todo Detail FAB */}
             <FloatingActionButton
               mode="todo-detail"
-              onAddTodo={onAddTodo}
+              onAddTodo={() => {}} // AddDialog is now handled in MobileDashboard
               onToggleComplete={() => onTodoCompletionToggle(selectedTodo.id)}
               onMoveTodo={() => {
                 // Could show status switcher or move to next status

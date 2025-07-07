@@ -17,7 +17,7 @@ import { useAuth } from "./hooks/useAuth";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useTodoFilters } from "./hooks/useTodoFilters";
 import { useIsMobile } from "./hooks/useMediaQuery";
-import MobileView from "./components/MobileView";
+import SimpleMobileView from "./components/SimpleMobileView";
 import type { Todo } from "./interfaces/todo.interface";
 
 
@@ -117,32 +117,15 @@ export default function App() {
           onClose={() => setIsAuthOpen(false)}
         />
         {isMobile ? (
-          <MobileView
+          <SimpleMobileView
             todos={visibleTodos}
             statuses={settings.statuses}
-            onTodoStatusChange={handleTodoStatusChange}
             onTodoCompletionToggle={handleTodoCompletionToggle}
-            onTodoClick={setSelectedTodo}
-            onAddTodo={() => {
-              // Use a default todo creation for mobile
-              handleAddTodo({
-                title: "",
-                description: ""
-              }, settings);
-            }}
+            onAddTodo={(values) => handleAddTodo(values, settings)}
+            deleteTodo={deleteTodo}
+            saveTodo={saveTodo}
             showCompleted={showCompleted}
             onToggleCompleted={() => setShowCompleted(!showCompleted)}
-            isSelectionMode={isSelectionMode}
-            selectedTodos={selectedTodos}
-            onTodoSelection={handleTodoSelection}
-            onEnterSelectionMode={() => setIsSelectionMode(true)}
-            onExitSelectionMode={() => {
-              setIsSelectionMode(false);
-              clearSelection();
-            }}
-            onBulkComplete={handleBulkComplete}
-            onBulkDelete={handleBulkDelete}
-            onBulkStatusChange={handleBulkStatusChange}
             user={user}
             completedCount={completedCount}
             onOpenSettings={() => setIsSettingsOpen(true)}

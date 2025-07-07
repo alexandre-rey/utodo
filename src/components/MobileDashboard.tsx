@@ -1,10 +1,10 @@
 // import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Button } from './ui/button';
 import { Progress } from './ui/progress';
-import { Plus, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import AddDialog from './AddDialog';
 import type { Todo } from '../interfaces/todo.interface';
 import type { StatusConfig } from '../services/save';
 
@@ -12,7 +12,7 @@ interface MobileDashboardProps {
   todos: Todo[];
   statuses: StatusConfig[];
   onStatusClick: (statusId: string) => void;
-  onAddTodo: () => void;
+  onAddTodo: (values: { title: string; description: string }) => void;
   showCompleted: boolean;
 }
 
@@ -112,14 +112,7 @@ export default function MobileDashboard({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold">{t('dashboard.statusOverview')}</h2>
-          <Button
-            onClick={onAddTodo}
-            size="sm"
-            className="h-9 px-3 bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            {t('todo.add')}
-          </Button>
+          <AddDialog onAddTodo={onAddTodo} />
         </div>
 
         {statuses.map((status) => {

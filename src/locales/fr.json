@@ -63,7 +63,8 @@
     "taskCompleted": "Cette tâche a été terminée",
     "taskPending": "Cette tâche est toujours en attente",
     "newTask": "Nouvelle tâche",
-    "newStatus": "Nouveau statut"
+    "newStatus": "Nouveau statut",
+    "add": "Ajouter"
   },
   "actions": {
     "add": "Ajouter",

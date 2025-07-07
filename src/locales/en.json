@@ -63,7 +63,8 @@
     "taskCompleted": "This task has been completed",
     "taskPending": "This task is still pending",
     "newTask": "New task",
-    "newStatus": "New Status"
+    "newStatus": "New Status",
+    "add": "Add"
   },
   "actions": {
     "add": "Add",
