@@ -2,6 +2,7 @@ import { apiClient } from '@/lib/api-client';
 import { loadFromStorage, saveToStorage } from '@/services/save';
 import { subscriptionService } from '@/services/subscription.service';
 import { type UserSettings, type UpdateSettingsDto, type CustomStatus, type ApiError } from '@/types/api';
+import { isPremiumFeaturesEnabled } from '@/utils/env';
 
 const DEFAULT_SETTINGS: UserSettings = {
   id: 'local-settings',
@@ -155,8 +156,18 @@ class SettingsService {
   }
 
   private async validateStatusLimits(customStatuses: CustomStatus[]): Promise<void> {
-    if (!apiClient.isAuthenticated()) {
-      return; // Skip validation for local users
+    const limit = 5; // Always enforce 5-category limit
+    
+    if (customStatuses.length > limit) {
+      const upgradeMessage = isPremiumFeaturesEnabled() 
+        ? "Upgrade to premium for unlimited statuses."
+        : "Maximum 5 status columns allowed.";
+      throw new Error(`Status limit exceeded. You can create up to ${limit} custom statuses. ${upgradeMessage}`);
+    }
+
+    // Only do server-side validation if premium features are enabled and user is authenticated
+    if (!isPremiumFeaturesEnabled() || !apiClient.isAuthenticated()) {
+      return;
     }
 
     try {

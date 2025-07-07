@@ -1,19 +1,17 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
 import { Badge } from "./ui/badge";
-import { Plus, Trash2, ChevronUp, ChevronDown, Star, Lock } from "lucide-react";
+import { Plus, Trash2, ChevronUp, ChevronDown, Star } from "lucide-react";
 import { useState } from "react";
 import type { StatusConfig, AppSettings } from "../services/save";
 import type { Todo } from "../interfaces/todo.interface";
 import { useStatusDeletion } from "../hooks/useStatusDeletion";
-import { useSubscription } from "../hooks/useSubscription";
 import StatusDeletionConfirmDialog from "./StatusDeletionConfirmDialog";
 import UpgradeDialog from "./UpgradeDialog";
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import SubscriptionManagement from './SubscriptionManagement';
+import { isPremiumFeaturesEnabled } from '../utils/env';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -29,35 +27,11 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     const [editingStatus, setEditingStatus] = useState<string | null>(null);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
     const { pendingDeletion, checkStatusDeletion, confirmDeletion, cancelDeletion } = useStatusDeletion(todos, onTodosUpdate);
-    const { 
-        statusLimits, 
-        isPremium, 
-        canCreateMoreStatuses, 
-        createCheckoutSession,
-        refreshData: refreshSubscriptionData,
-        updateStatusLimitsOptimistically,
-        isLoading: subscriptionLoading 
-    } = useSubscription();
+    const premiumEnabled = isPremiumFeaturesEnabled();
     
-    // Wrapper function that updates settings and refreshes subscription data
-    const updateSettingsAndRefresh = async (newSettings: AppSettings, countChange = 0) => {
-        // Optimistically update status limits immediately for consistent UI
-        if (countChange !== 0) {
-            updateStatusLimitsOptimistically(countChange);
-        }
-        
-        try {
-            // Save settings to server FIRST
-            await setSettings(newSettings);
-            // Then refresh subscription data after server confirms the change
-            refreshSubscriptionData();
-        } catch (error) {
-            // If save failed, revert the optimistic update
-            if (countChange !== 0) {
-                updateStatusLimitsOptimistically(-countChange);
-            }
-            throw error;
-        }
+    // Wrapper function that updates settings
+    const updateSettingsAndRefresh = async (newSettings: AppSettings) => {
+        await setSettings(newSettings);
     };
 
     const updateStatus = async (id: string, updates: Partial<StatusConfig>) => {
@@ -68,12 +42,12 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     };
 
     const addStatus = async () => {
-        // Check if user can create more statuses
-        if (!canCreateMoreStatuses) {
-            if (isPremium) {
-                toast.error(t('errors.statusLimitReached'));
-            } else {
+        // Check if we're at the limit
+        if (settings.statuses.length >= 5) {
+            if (premiumEnabled) {
                 setShowUpgradeDialog(true);
+            } else {
+                toast.error("Maximum 5 status columns allowed.");
             }
             return;
         }
@@ -85,16 +59,18 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
             color: "#e5e7eb"
         };
         try {
-            await updateSettingsAndRefresh({ statuses: [...settings.statuses, newStatus] }, +1);
+            await updateSettingsAndRefresh({ statuses: [...settings.statuses, newStatus] });
             setEditingStatus(newId);
-        } catch {
-            // Error handling is already done in updateSettingsAndRefresh
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            }
         }
     };
 
     const handleUpgrade = async (priceId: string) => {
-        await createCheckoutSession(priceId);
-        // User will be redirected to Stripe Checkout
+        // This would handle the upgrade process in premium mode
+        console.warn('Upgrade requested for price:', priceId);
         setShowUpgradeDialog(false);
     };
 
@@ -108,7 +84,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         if (canDelete) {
             // Safe to delete immediately - no todos affected
             try {
-                await updateSettingsAndRefresh({ statuses: settings.statuses.filter(status => status.id !== id) }, -1);
+                await updateSettingsAndRefresh({ statuses: settings.statuses.filter(status => status.id !== id) });
             } catch {
                 // Error handling is already done in updateSettingsAndRefresh
             }
@@ -145,7 +121,7 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
         try {
             await updateSettingsAndRefresh({ 
                 statuses: remainingStatuses
-            }, -1);
+            });
         } catch {
             // Error handling is already done in updateSettingsAndRefresh
         }
@@ -160,13 +136,15 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                 onConfirm={handleConfirmDeletion}
                 onCancel={cancelDeletion}
             />
-            <UpgradeDialog
-                isOpen={showUpgradeDialog}
-                onClose={() => setShowUpgradeDialog(false)}
-                onUpgrade={handleUpgrade}
-                currentLimit={statusLimits.limit}
-                currentUsage={statusLimits.count}
-            />
+            {premiumEnabled && (
+                <UpgradeDialog
+                    isOpen={showUpgradeDialog}
+                    onClose={() => setShowUpgradeDialog(false)}
+                    onUpgrade={handleUpgrade}
+                    currentLimit={5}
+                    currentUsage={settings.statuses.length}
+                />
+            )}
         <Dialog open={isOpen} onOpenChange={(open) => {
             if (!open) {
                 onClose();
@@ -181,62 +159,54 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
                 </DialogHeader>
                 
                 <div className="grid gap-6 py-4 max-h-96 overflow-y-auto">
-                    {/* Subscription Management Section */}
-                    <SubscriptionManagement />
+                    {premiumEnabled && (
+                        <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <h3 className="text-lg font-semibold text-yellow-800 mb-2">Premium Features Enabled</h3>
+                            <p className="text-sm text-yellow-700">You have access to all premium features including unlimited status columns.</p>
+                        </div>
+                    )}
                     
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <h3 className="text-lg font-semibold">{t('messages.statusColumns')}</h3>
-                                {isPremium && (
+                                {premiumEnabled && (
                                     <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
                                         <Star className="h-3 w-3 mr-1" />
-                                        {t('subscription.premium')}
+                                        Premium
                                     </Badge>
                                 )}
                             </div>
                             <Button 
                                 onClick={addStatus} 
                                 size="sm" 
-                                variant={!canCreateMoreStatuses && !isPremium ? "default" : "outline"}
-                                disabled={isPremium && !canCreateMoreStatuses}
-                                className={!canCreateMoreStatuses && !isPremium ? "bg-yellow-600 hover:bg-yellow-700 text-white" : ""}
+                                variant="outline"
+                                disabled={settings.statuses.length >= 5}
                             >
-                                {!canCreateMoreStatuses && !isPremium ? (
-                                    <Lock className="h-4 w-4 mr-1" />
-                                ) : (
-                                    <Plus className="h-4 w-4 mr-1" />
-                                )}
-                                {!canCreateMoreStatuses && !isPremium ? t('subscription.upgradeForMore') : t('messages.addStatus')}
+                                <Plus className="h-4 w-4 mr-1" />
+                                {t('messages.addStatus')}
                             </Button>
                         </div>
 
-                        {/* Status limits display */}
-                        {!subscriptionLoading && (
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm font-medium">
-                                        {t('subscription.statusUsage')}
-                                    </span>
-                                    <span className="text-sm text-gray-600">
-                                        {statusLimits.count} / {
-                                            isPremium ? t('subscription.unlimited') : statusLimits.limit
-                                        }
-                                    </span>
-                                </div>
-                                {!isPremium && (
-                                    <Progress 
-                                        value={(statusLimits.count / statusLimits.limit) * 100} 
-                                        className="h-2"
-                                    />
-                                )}
-                                {!isPremium && !canCreateMoreStatuses && (
-                                    <p className="text-xs text-amber-600 mt-2">
-                                        {t('subscription.limitReachedUpgrade')}
-                                    </p>
-                                )}
+                        {/* Status count display */}
+                        <div className="bg-gray-50 p-3 rounded-lg">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium">
+                                    Status Columns
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                    {settings.statuses.length} / 5
+                                </span>
                             </div>
-                        )}
+                            {settings.statuses.length >= 5 && (
+                                <p className="text-xs text-amber-600 mt-2">
+                                    {premiumEnabled 
+                                        ? "Limit reached. Upgrade for unlimited columns." 
+                                        : "Maximum 5 status columns allowed."
+                                    }
+                                </p>
+                            )}
+                        </div>
                         
                         <div className="grid gap-3">
                             {settings.statuses.map((status, index) => (
