@@ -1,5 +1,3 @@
-import { useState } from "react";
-import QuickAdd from "./components/QuickAdd";
 import { Toaster } from "./components/ui/sonner";
 import OpenDialog from "./components/OpenDialog";
 import DisplayTodos from "./components/DisplayTodos";
@@ -10,45 +8,51 @@ import BulkActionsToolbar from "./components/BulkActionsToolbar";
 import AppHeader from "./components/AppHeader";
 import SearchBar from "./components/SearchBar";
 import Footer from "./components/Footer";
-import { useTodos } from "./hooks/useTodos";
-import { useBulkActions } from "./hooks/useBulkActions";
-import { useSettings } from "./hooks/useSettings";
-import { useAuth } from "./hooks/useAuth";
+import QuickAdd from "./components/QuickAdd";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
-import { useTodoFilters } from "./hooks/useTodoFilters";
 import { useIsMobile } from "./hooks/useMediaQuery";
 import SimpleMobileView from "./components/SimpleMobileView";
-import type { Todo } from "./interfaces/todo.interface";
-
+import { useTodosContext } from "./contexts/TodosContext";
+import { useSettingsContext } from "./contexts/SettingsContext";
+import { useAuth } from "./contexts/AuthContext";
+import { useAppUIContext } from "./contexts/AppContext";
 
 export default function App() {
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [showCompleted, setShowCompleted] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<'kanban' | 'calendar'>('kanban');
-
-  // Custom hooks
-  const { todos, setTodos, handleAddTodo, deleteTodo, saveTodo, handleTodoStatusChange, handleTodoCompletionToggle, completedCount } = useTodos();
-  const { settings, handleSettingsChange } = useSettings();
-  const { user, handleSignOut } = useAuth();
-  const { visibleTodos, allVisibleSelected } = useTodoFilters(todos, showCompleted, searchQuery);
-  const isMobile = useIsMobile();
-  
-  // For bulk actions, we need to pass a callback that triggers a re-render
-  // In a real app, you'd use a state management library
-  const { 
-    selectedTodos, 
-    isSelectionMode, 
+  // Get data from contexts instead of local state
+  const {
+    todos,
+    visibleTodos,
+    searchQuery,
+    setSearchQuery,
+    showCompleted,
+    setShowCompleted,
+    completedCount,
+    setTodos,
+    handleAddTodo,
+    deleteTodo,
+    saveTodo,
+    isSelectionMode,
     setIsSelectionMode,
-    handleTodoSelection, 
-    handleSelectAll, 
-    handleBulkDelete, 
-    handleBulkComplete, 
-    handleBulkStatusChange,
-    clearSelection 
-  } = useBulkActions(todos, setTodos);
+    selectedTodos,
+    handleSelectAll,
+    handleBulkDelete,
+    clearSelection
+  } = useTodosContext();
+
+  const { settings, handleSettingsChange } = useSettingsContext();
+  const { user, logout } = useAuth();
+  const {
+    selectedTodo,
+    setSelectedTodo,
+    isSettingsOpen,
+    setIsSettingsOpen,
+    isAuthOpen,
+    setIsAuthOpen,
+    viewMode,
+    setViewMode
+  } = useAppUIContext();
+
+  const isMobile = useIsMobile();
 
   const handleCloseDialog = () => {
     setSelectedTodo(null);
@@ -84,7 +88,7 @@ export default function App() {
               setShowCompleted={setShowCompleted}
               completedCount={completedCount}
               user={user}
-              handleSignOut={handleSignOut}
+              handleSignOut={logout}
               setIsAuthOpen={setIsAuthOpen}
               setIsSettingsOpen={setIsSettingsOpen}
             />
@@ -97,83 +101,42 @@ export default function App() {
             <QuickAdd onAddTodo={(values) => handleAddTodo(values, settings)} />
           </>
         )}
+        
         <OpenDialog 
           todo={selectedTodo} 
           closeDialog={handleCloseDialog} 
-          deleteTodo={deleteTodo} 
+          deleteTodo={deleteTodo}
           saveTodo={saveTodo}
           statuses={settings.statuses}
         />
+        
         <SettingsPanel 
           isOpen={isSettingsOpen} 
           onClose={() => setIsSettingsOpen(false)}
           settings={settings}
           setSettings={handleSettingsChange}
           todos={todos}
-          onTodosUpdate={setTodos}
+          onTodosUpdate={(newTodos) => setTodos(newTodos)}
         />
+        
         <AuthPanel
           isOpen={isAuthOpen}
           onClose={() => setIsAuthOpen(false)}
         />
+        
         {isMobile ? (
-          <SimpleMobileView
-            todos={visibleTodos}
-            statuses={settings.statuses}
-            onTodoCompletionToggle={handleTodoCompletionToggle}
-            onAddTodo={(values) => handleAddTodo(values, settings)}
-            deleteTodo={deleteTodo}
-            saveTodo={saveTodo}
-            showCompleted={showCompleted}
-            onToggleCompleted={() => setShowCompleted(!showCompleted)}
-            user={user}
-            completedCount={completedCount}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onOpenAuth={() => setIsAuthOpen(true)}
-            onSignOut={handleSignOut}
-          />
+          <SimpleMobileView />
         ) : (
           viewMode === 'kanban' ? (
-            <DisplayTodos 
-              todos={todos} 
-              setSelectedTodo={setSelectedTodo}
-              statuses={settings.statuses}
-              onTodoStatusChange={handleTodoStatusChange}
-              onTodoCompletionToggle={handleTodoCompletionToggle}
-              showCompleted={showCompleted}
-              searchQuery={searchQuery}
-              isSelectionMode={isSelectionMode}
-              selectedTodos={selectedTodos}
-              onTodoSelection={handleTodoSelection}
-              onEnterSelectionMode={() => setIsSelectionMode(true)}
-            />
+            <DisplayTodos />
           ) : (
-            <CalendarView
-              todos={todos}
-              setSelectedTodo={setSelectedTodo}
-              onTodoCompletionToggle={handleTodoCompletionToggle}
-              showCompleted={showCompleted}
-              searchQuery={searchQuery}
-              isSelectionMode={isSelectionMode}
-              selectedTodos={selectedTodos}
-              onTodoSelection={handleTodoSelection}
-              onEnterSelectionMode={() => setIsSelectionMode(true)}
-            />
+            <CalendarView />
           )
         )}
         
         {/* Bulk Actions Toolbar - Desktop only */}
         {!isMobile && (
-          <BulkActionsToolbar
-            selectedCount={selectedTodos.size}
-            onSelectAll={() => handleSelectAll(visibleTodos)}
-            onClearSelection={clearSelection}
-            onBulkDelete={handleBulkDelete}
-            onBulkComplete={handleBulkComplete}
-            onBulkStatusChange={handleBulkStatusChange}
-            statuses={settings.statuses}
-            allSelected={allVisibleSelected(selectedTodos)}
-          />
+          <BulkActionsToolbar />
         )}
         
         {!isMobile && <Footer />}
@@ -181,4 +144,3 @@ export default function App() {
     </>
   )
 }
-

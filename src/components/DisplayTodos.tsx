@@ -1,38 +1,27 @@
-import type { Todo } from "../interfaces/todo.interface";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import type { StatusConfig } from "../services/save";
 import { useState } from "react";
 import { Check, Calendar, AlertTriangle, Square, CheckSquare } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import { useTodosContext } from '../contexts/TodosContext';
+import { useSettingsContext } from '../contexts/SettingsContext';
+import { useAppUIContext } from '../contexts/AppContext';
 
-interface DisplayTodosProps {
-    todos: Todo[];
-    setSelectedTodo: (todo: Todo | null) => void;
-    statuses: StatusConfig[];
-    onTodoStatusChange: (todoId: string, newStatus: string) => void;
-    onTodoCompletionToggle: (todoId: string) => void;
-    showCompleted: boolean;
-    searchQuery: string;
-    isSelectionMode: boolean;
-    selectedTodos: Set<string>;
-    onTodoSelection: (todoId: string, isSelected: boolean) => void;
-    onEnterSelectionMode: () => void;
-}
-
-export default function DisplayTodos({ 
-    todos, 
-    setSelectedTodo, 
-    statuses, 
-    onTodoStatusChange, 
-    onTodoCompletionToggle, 
-    showCompleted, 
-    searchQuery, 
-    isSelectionMode, 
-    selectedTodos, 
-    onTodoSelection, 
-    onEnterSelectionMode 
-}: DisplayTodosProps) {
+export default function DisplayTodos() {
+    const { 
+        todos, 
+        handleTodoStatusChange, 
+        handleTodoCompletionToggle, 
+        showCompleted, 
+        searchQuery, 
+        isSelectionMode, 
+        selectedTodos, 
+        handleTodoSelection, 
+        setIsSelectionMode 
+    } = useTodosContext();
+    const { statuses } = useSettingsContext();
+    const { setSelectedTodo } = useAppUIContext();
     const { t } = useTranslation();
     const [draggedTodo, setDraggedTodo] = useState<string | null>(null);
     const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
@@ -103,7 +92,7 @@ export default function DisplayTodos({
         
         const todo = todos.find(t => t.id === todoId);
         if (todo && todo.status !== newStatusId) {
-            onTodoStatusChange(todoId, newStatusId);
+            handleTodoStatusChange(todoId, newStatusId);
         }
         
         setDraggedTodo(null);
@@ -160,7 +149,7 @@ export default function DisplayTodos({
                                 onDragEnd={!isSelectionMode ? handleDragEnd : undefined}
                                 onClick={() => {
                                     if (isSelectionMode) {
-                                        onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                        handleTodoSelection(todo.id, !selectedTodos.has(todo.id));
                                     } else if (!draggedTodo) {
                                         setSelectedTodo(todo);
                                     }
@@ -168,8 +157,8 @@ export default function DisplayTodos({
                                 onContextMenu={(e) => {
                                     if (!isSelectionMode) {
                                         e.preventDefault();
-                                        onEnterSelectionMode();
-                                        onTodoSelection(todo.id, true);
+                                        setIsSelectionMode(true);
+                                        handleTodoSelection(todo.id, true);
                                     }
                                 }}
                             >
@@ -217,7 +206,7 @@ export default function DisplayTodos({
                                             }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onTodoCompletionToggle(todo.id);
+                                                handleTodoCompletionToggle(todo.id);
                                             }}
                                         >
                                             <Check className="h-4 w-4" />

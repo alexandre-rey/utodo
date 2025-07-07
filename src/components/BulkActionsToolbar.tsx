@@ -2,30 +2,25 @@ import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card } from "./ui/card";
 import { CheckSquare, Trash2, X, Tag } from "lucide-react";
-import type { StatusConfig } from "../services/save";
 import { useTranslation } from 'react-i18next';
+import { useTodosContext } from '../contexts/TodosContext';
+import { useSettingsContext } from '../contexts/SettingsContext';
 
-interface BulkActionsToolbarProps {
-    selectedCount: number;
-    onSelectAll: () => void;
-    onClearSelection: () => void;
-    onBulkDelete: () => void;
-    onBulkComplete: () => void;
-    onBulkStatusChange: (status: string) => void;
-    statuses: StatusConfig[];
-    allSelected: boolean;
-}
-
-export default function BulkActionsToolbar({
-    selectedCount,
-    onSelectAll,
-    onClearSelection,
-    onBulkDelete,
-    onBulkComplete,
-    onBulkStatusChange,
-    statuses,
-    allSelected
-}: BulkActionsToolbarProps) {
+export default function BulkActionsToolbar() {
+    const {
+        selectedTodos,
+        handleSelectAll,
+        clearSelection,
+        handleBulkDelete,
+        handleBulkComplete,
+        handleBulkStatusChange,
+        allVisibleSelected,
+        visibleTodos
+    } = useTodosContext();
+    const { statuses } = useSettingsContext();
+    
+    const selectedCount = selectedTodos.size;
+    const allSelected = allVisibleSelected(selectedTodos);
     const { t } = useTranslation();
     if (selectedCount === 0) return null;
 
@@ -40,7 +35,7 @@ export default function BulkActionsToolbar({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={allSelected ? onClearSelection : onSelectAll}
+                        onClick={allSelected ? clearSelection : () => handleSelectAll(visibleTodos)}
                         className="text-xs h-6 px-2"
                     >
                         {allSelected ? t('actions.deselectAll') : t('actions.selectAll')}
@@ -56,7 +51,7 @@ export default function BulkActionsToolbar({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={onBulkComplete}
+                        onClick={handleBulkComplete}
                         className="flex items-center gap-2 text-green-700 hover:bg-green-50"
                     >
                         <CheckSquare className="h-4 w-4" />
@@ -64,7 +59,7 @@ export default function BulkActionsToolbar({
                     </Button>
 
                     {/* Change Status */}
-                    <Select onValueChange={onBulkStatusChange}>
+                    <Select onValueChange={handleBulkStatusChange}>
                         <SelectTrigger className="w-32 h-8 text-xs">
                             <div className="flex items-center gap-2">
                                 <Tag className="h-3 w-3" />
@@ -90,7 +85,7 @@ export default function BulkActionsToolbar({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={onBulkDelete}
+                        onClick={handleBulkDelete}
                         className="flex items-center gap-2 text-red-700 hover:bg-red-50"
                     >
                         <Trash2 className="h-4 w-4" />
@@ -102,7 +97,7 @@ export default function BulkActionsToolbar({
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={onClearSelection}
+                    onClick={clearSelection}
                     className="h-6 w-6 ml-2"
                 >
                     <X className="h-3 w-3" />

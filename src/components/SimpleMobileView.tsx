@@ -7,56 +7,45 @@ import { Badge } from './ui/badge';
 import MobileHeader from './MobileHeader';
 import AddDialog from './AddDialog';
 import OpenDialog from './OpenDialog';
+import { useTodosContext } from '../contexts/TodosContext';
+import { useSettingsContext } from '../contexts/SettingsContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useAppUIContext } from '../contexts/AppContext';
 import type { Todo } from '../interfaces/todo.interface';
 import type { StatusConfig } from '../services/save';
 
-type TransformedUser = {
-  email: string;
-  name: string;
-} | null;
-
-interface SimpleMobileViewProps {
-  todos: Todo[];
-  statuses: StatusConfig[];
-  onTodoCompletionToggle: (todoId: string) => void;
-  onAddTodo: (values: { title: string; description: string }) => void;
-  deleteTodo: (todoId: string) => void;
-  saveTodo: (todo: Todo) => void;
-  showCompleted: boolean;
-  onToggleCompleted: () => void;
-  user: TransformedUser;
-  completedCount: number;
-  onOpenSettings: () => void;
-  onOpenAuth: () => void;
-  onSignOut: () => void;
-}
-
 type ViewMode = 'dashboard' | 'todo-list';
 
-export default function SimpleMobileView({
-  todos,
-  statuses,
-  onTodoCompletionToggle,
-  onAddTodo,
-  deleteTodo,
-  saveTodo,
-  showCompleted,
-  onToggleCompleted,
-  user,
-  completedCount,
-  onOpenSettings,
-  onOpenAuth,
-  onSignOut
-}: SimpleMobileViewProps) {
+export default function SimpleMobileView() {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
   const [selectedStatus, setSelectedStatus] = useState<StatusConfig | null>(null);
-  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  
+  // Use contexts instead of props
+  const {
+    visibleTodos,
+    completedCount,
+    handleAddTodo,
+    handleTodoCompletionToggle,
+    deleteTodo,
+    saveTodo,
+    showCompleted,
+    setShowCompleted
+  } = useTodosContext();
+  
+  const { statuses, settings } = useSettingsContext();
+  const { user, logout } = useAuth();
+  const { 
+    selectedTodo, 
+    setSelectedTodo, 
+    setIsSettingsOpen, 
+    setIsAuthOpen 
+  } = useAppUIContext();
 
   // Calculate stats
-  const totalTodos = todos.length;
-  const completedTodos = todos.filter(todo => todo.isCompleted).length;
-  const todayCompletedCount = todos.filter(todo => {
+  const totalTodos = visibleTodos.length;
+  const completedTodos = visibleTodos.filter(todo => todo.isCompleted).length;
+  const todayCompletedCount = visibleTodos.filter(todo => {
     const today = new Date().toDateString();
     const updatedDate = new Date(todo.updatedAt).toDateString();
     return todo.isCompleted && updatedDate === today;
@@ -64,7 +53,7 @@ export default function SimpleMobileView({
 
   // Get todos by status
   const getTodosByStatus = (statusId: string) => {
-    return todos.filter(todo => {
+    return visibleTodos.filter(todo => {
       if (!showCompleted && todo.isCompleted) return false;
       return todo.status === statusId;
     });
@@ -105,10 +94,10 @@ export default function SimpleMobileView({
           user={user}
           completedCount={completedCount}
           showCompleted={showCompleted}
-          onToggleCompleted={onToggleCompleted}
-          onOpenSettings={onOpenSettings}
-          onOpenAuth={onOpenAuth}
-          onSignOut={onSignOut}
+          onToggleCompleted={() => setShowCompleted(!showCompleted)}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenAuth={() => setIsAuthOpen(true)}
+          onSignOut={logout}
         />
 
         <div className="p-4 space-y-6">
@@ -140,7 +129,7 @@ export default function SimpleMobileView({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">{t('dashboard.statusOverview')}</h2>
-              <AddDialog onAddTodo={onAddTodo} />
+              <AddDialog onAddTodo={(values) => handleAddTodo(values, settings)} />
             </div>
 
             {statuses.map((status) => {
@@ -229,7 +218,7 @@ export default function SimpleMobileView({
                     <div 
                       onClick={(e) => {
                         e.stopPropagation();
-                        onTodoCompletionToggle(todo.id);
+                        handleTodoCompletionToggle(todo.id);
                       }}
                       className="cursor-pointer p-1 -m-1"
                     >
@@ -264,7 +253,7 @@ export default function SimpleMobileView({
 
         {/* Floating Add Button */}
         <div className="fixed bottom-6 right-6">
-          <AddDialog onAddTodo={onAddTodo} />
+          <AddDialog onAddTodo={(values) => handleAddTodo(values, settings)} />
         </div>
 
         {/* Todo Dialog */}

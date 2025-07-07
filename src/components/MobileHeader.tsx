@@ -13,13 +13,10 @@ import {
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-type TransformedUser = {
-  email: string;
-  name: string;
-} | null;
+import type { User as UserType } from '../types/api';
 
 interface MobileHeaderProps {
-  user: TransformedUser;
+  user: UserType | null;
   completedCount: number;
   showCompleted: boolean;
   onToggleCompleted: () => void;
@@ -125,7 +122,7 @@ export default function MobileHeader({
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
-                        {user.name}
+                        {user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
                         {user.email}

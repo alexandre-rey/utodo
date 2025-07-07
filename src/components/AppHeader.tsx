@@ -2,6 +2,7 @@ import { Button } from "./ui/button";
 import { Settings, Eye, EyeOff, Calendar, Columns, User, LogOut } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import type { User as UserType } from '../types/api';
 
 interface AppHeaderProps {
   viewMode: 'kanban' | 'calendar';
@@ -9,7 +10,7 @@ interface AppHeaderProps {
   showCompleted: boolean;
   setShowCompleted: (show: boolean) => void;
   completedCount: number;
-  user: { email: string; name: string } | null;
+  user: UserType | null;
   handleSignOut: () => void;
   setIsAuthOpen: (open: boolean) => void;
   setIsSettingsOpen: (open: boolean) => void;
@@ -58,7 +59,7 @@ export default function AppHeader({
         {user ? (
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline text-sm text-slate-600">
-              {t('auth.hello', { name: user.name })}
+              {t('auth.hello', { name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email })}
             </span>
             <Button
               variant="ghost"

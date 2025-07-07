@@ -9,10 +9,7 @@ import FloatingActionButton from './FloatingActionButton';
 import QuickStatusSwitcher from './QuickStatusSwitcher';
 import type { Todo } from '../interfaces/todo.interface';
 import type { StatusConfig } from '../services/save';
-type TransformedUser = {
-  email: string;
-  name: string;
-} | null;
+import type { User } from '../types/api';
 
 interface MobileViewProps {
   todos: Todo[];
@@ -31,7 +28,7 @@ interface MobileViewProps {
   onBulkComplete: () => void;
   onBulkDelete: () => void;
   onBulkStatusChange: (statusId: string) => void;
-  user: TransformedUser;
+  user: User | null;
   completedCount: number;
   onOpenSettings: () => void;
   onOpenAuth: () => void;

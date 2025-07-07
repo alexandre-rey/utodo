@@ -1,5 +1,5 @@
 {
-  "name": "µtodo",
+  "name": "utodo",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -17,7 +17,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-router": "^1.125.3",
-    "@tanstack/router-devtools": "^1.125.3",
+    "@tanstack/react-router-devtools": "1.125.6",
     "@tanstack/router-vite-plugin": "^1.125.3",
     "@types/crypto-js": "^4.2.2",
     "@types/dompurify": "^3.0.5",
