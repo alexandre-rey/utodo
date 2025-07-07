@@ -1,7 +1,9 @@
 {
   "common": {
     "cancel": "Cancel",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No"
   },
   "app": {
     "title": "µTodo",
@@ -105,7 +107,12 @@
     "whatShouldBeDone": "What should be done",
     "addDescriptionOptional": "Add description (optional)...",
     "searchTodosShortcut": "Search todos... (Ctrl+K)",
-    "updateStatus": "Update status"
+    "updateStatus": "Update status",
+    "quickStatusChange": "Quick status change",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "normal": "Normal"
   },
   "messages": {
     "noTodos": "No todos found",
@@ -208,6 +215,27 @@
     "cancelError": "Failed to cancel subscription. Please try again.",
     "reactivateSuccess": "Subscription reactivated successfully!",
     "reactivateError": "Failed to reactivate subscription. Please try again."
+  },
+  "dashboard": {
+    "totalTodos": "Total",
+    "completedToday": "Today",
+    "progress": "Progress",
+    "overallProgress": "Overall Progress",
+    "completed": "completed",
+    "statusOverview": "Status Overview",
+    "andMore": "+ {{count}} more",
+    "noTodos": "No todos",
+    "noTodosInStatus": "No todos in {{status}}"
+  },
+  "actions": {
+    "markComplete": "Mark complete",
+    "markIncomplete": "Mark incomplete",
+    "move": "Move",
+    "delete": "Delete",
+    "addNew": "Add new",
+    "changed": "Changed",
+    "undo": "Undo",
+    "selected": "selected"
   },
   "legal": {
     "contact": {

@@ -1,7 +1,9 @@
 {
   "common": {
     "cancel": "Annuler",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "yes": "Oui",
+    "no": "Non"
   },
   "app": {
     "title": "µTodo",
@@ -105,7 +107,12 @@
     "whatShouldBeDone": "Que faut-il faire",
     "addDescriptionOptional": "Ajouter une description (optionnel)...",
     "searchTodosShortcut": "Rechercher des tâches... (Ctrl+K)",
-    "updateStatus": "Mettre à jour le statut"
+    "updateStatus": "Mettre à jour le statut",
+    "quickStatusChange": "Changement rapide de statut",
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible",
+    "normal": "Normal"
   },
   "messages": {
     "noTodos": "Aucune tâche trouvée",
@@ -208,6 +215,27 @@
     "cancelError": "Échec de l'annulation de l'abonnement. Veuillez réessayer.",
     "reactivateSuccess": "Abonnement réactivé avec succès !",
     "reactivateError": "Échec de la réactivation de l'abonnement. Veuillez réessayer."
+  },
+  "dashboard": {
+    "totalTodos": "Total",
+    "completedToday": "Aujourd'hui",
+    "progress": "Progrès",
+    "overallProgress": "Progrès général",
+    "completed": "terminé(s)",
+    "statusOverview": "Aperçu des statuts",
+    "andMore": "+ {{count}} de plus",
+    "noTodos": "Aucune tâche",
+    "noTodosInStatus": "Aucune tâche dans {{status}}"
+  },
+  "actions": {
+    "markComplete": "Marquer comme terminé",
+    "markIncomplete": "Marquer comme non terminé",
+    "move": "Déplacer",
+    "delete": "Supprimer",
+    "addNew": "Ajouter nouveau",
+    "changed": "Modifié",
+    "undo": "Annuler",
+    "selected": "sélectionné(s)"
   },
   "legal": {
     "contact": {
