@@ -126,7 +126,6 @@ class SettingsService {
     const localSettings = this.getLocalSettings();
     
     try {
-      console.log('Syncing local settings to server...');
       
       await this.updateSettings({
         customStatuses: localSettings.customStatuses,
@@ -136,7 +135,6 @@ class SettingsService {
       });
 
       this.markAsSynced();
-      console.log('Successfully synced local settings to server');
     } catch (error) {
       console.error('Failed to sync local settings to server:', error);
     }

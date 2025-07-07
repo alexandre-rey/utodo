@@ -1,5 +1,5 @@
 import { type ApiError } from '@/types/api';
-import { CookieAuth } from '@/utils/cookieAuth';
+import { TokenSecurity } from '@/utils/xssProtection';
 
 class ApiClient {
   private baseURL: string;
@@ -50,31 +50,35 @@ class ApiClient {
 
   private loadTokensFromStorage() {
     if (typeof window !== 'undefined') {
-      // Migration: Move existing tokens from localStorage
-      CookieAuth.migrateTokensFromStorage();
-      
-      // For backward compatibility during transition
-      this.accessToken = localStorage.getItem('access_token');
-      this.refreshToken = localStorage.getItem('refresh_token');
+      // Securely load and validate tokens from localStorage
+      this.accessToken = TokenSecurity.secureRetrieve('access_token');
+      this.refreshToken = TokenSecurity.secureRetrieve('refresh_token');
     }
   }
 
   private saveTokensToStorage(accessToken: string, refreshToken: string) {
-    // In a secure implementation, tokens would be set as httpOnly cookies by the server
-    // For now, we use localStorage but log a security warning
-    console.warn('Security Warning: Tokens should be stored in httpOnly cookies by the server');
-    
     if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
+      // Securely store and validate tokens in localStorage
+      const accessStored = TokenSecurity.secureStore('access_token', accessToken);
+      const refreshStored = TokenSecurity.secureStore('refresh_token', refreshToken);
+      
+      if (!accessStored || !refreshStored) {
+        console.error('Failed to store tokens securely - clearing existing tokens');
+        return;
+      }
     }
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
   }
 
   private clearTokensFromStorage() {
-    // Clear both cookie and localStorage tokens
-    CookieAuth.clearAuth();
+    // Clear localStorage tokens
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+    }
+    
+    // Clear in-memory tokens
     this.accessToken = null;
     this.refreshToken = null;
   }
@@ -83,7 +87,7 @@ class ApiClient {
     if (!this.refreshToken) {
       throw new Error('No refresh token available');
     }
-
+    
     const response = await fetch(`${this.baseURL}/auth/refresh`, {
       method: 'POST',
       headers: {
@@ -93,8 +97,9 @@ class ApiClient {
     });
 
     if (!response.ok) {
+      console.error('Token refresh failed:', response.status, response.statusText);
       this.clearTokensFromStorage();
-      throw new Error('Token refresh failed');
+      throw new Error(`Token refresh failed: ${response.status}`);
     }
 
     const data = await response.json();
@@ -112,8 +117,6 @@ class ApiClient {
       ...options.headers,
     };
 
-    // Add CSRF protection for cookie-based auth (disabled for dev due to CORS)
-    // headers = CSRFProtection.addToHeaders(headers as Record<string, string>);
 
     if (this.accessToken) {
       headers = {
@@ -125,7 +128,7 @@ class ApiClient {
     let response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Include httpOnly cookies in requests
+credentials: 'include'
     });
 
     if (response.status === 401 && this.refreshToken && endpoint !== '/auth/refresh') {
@@ -146,7 +149,7 @@ class ApiClient {
       response = await fetch(url, {
         ...options,
         headers,
-        credentials: 'include', // Include httpOnly cookies in requests
+  credentials: 'include'
       });
     }
 
@@ -218,8 +221,7 @@ class ApiClient {
   }
 
   public isAuthenticated(): boolean {
-    // Check both localStorage (for backward compatibility) and cookie-based auth
-    return !!this.accessToken || CookieAuth.isAuthenticated();
+    return !!this.accessToken;
   }
 }
 

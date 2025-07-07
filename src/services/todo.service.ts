@@ -218,40 +218,32 @@ class TodoService {
   }
 
   public async syncLocalTodosToServer(): Promise<void> {
-    console.log('syncLocalTodosToServer called');
     
     if (!apiClient.isAuthenticated()) {
-      console.log('Not authenticated, skipping sync');
       return;
     }
 
     // Check if we've already synced this session
     if (this.hasSynced) {
-      console.log('Already synced this session, skipping');
       return;
     }
 
     // Check if sync was already completed in a previous session
     const syncFlag = localStorage.getItem(this.SYNC_FLAG_KEY);
-    console.log('Sync flag:', syncFlag);
     if (syncFlag === 'true') {
       this.hasSynced = true;
-      console.log('Already synced in previous session, skipping');
       return;
     }
 
     const localTodos = this.getLocalTodosData();
-    console.log(`Found ${localTodos.length} local todos to sync`);
     
     if (localTodos.length === 0) {
       // Mark as synced even if no todos to avoid future checks
       this.markAsSynced();
-      console.log('No local todos to sync');
       return;
     }
 
     try {
-      console.log(`Syncing ${localTodos.length} local todos to server...`);
       
       for (const todo of localTodos) {
         await this.createTodo({
@@ -262,14 +254,12 @@ class TodoService {
           dueDate: todo.dueDate,
         });
       }
-
-      // Clear local todos and mark as synced
+      
       saveToStorage(this.STORAGE_KEY, []);
       this.markAsSynced();
-      
-      console.log('Successfully synced local todos to server');
     } catch (error) {
       console.error('Failed to sync local todos to server:', error);
+      throw error;
     }
   }
 
@@ -284,16 +274,8 @@ class TodoService {
   }
 
   public async forceSyncToServer(): Promise<void> {
-    console.log('Force sync requested');
     this.resetSyncFlag();
     await this.syncLocalTodosToServer();
-  }
-
-  public debugLocalTodos(): void {
-    const localTodos = this.getLocalTodosData();
-    console.log('Local todos:', localTodos);
-    console.log('Sync flag:', localStorage.getItem(this.SYNC_FLAG_KEY));
-    console.log('Has synced:', this.hasSynced);
   }
 }
 

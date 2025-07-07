@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { useTranslation } from 'react-i18next';
+import { HTMLSanitizer, InputValidator } from '@/utils/xssProtection';
 
 interface AddDialogProps {
     onAddTodo: (values: { title: string; description: string }) => void;
@@ -16,14 +17,29 @@ export default function AddDialog({ onAddTodo }: AddDialogProps) {
     const [description, setDescription] = useState("");
 
     const onSaveClick = (e: React.FormEvent) => {
+        e.preventDefault();
 
-        if (title.trim() === "") {
-            e.preventDefault();
+        // Validate and sanitize input
+        const sanitizedTitle = HTMLSanitizer.sanitizeInput(title.trim());
+        const sanitizedDescription = HTMLSanitizer.sanitizeInput(description.trim());
+
+        if (!sanitizedTitle) {
             toast.error(t('errors.titleRequired'));
             return;
         }
 
-        onAddTodo({ title, description });
+        // Additional validation
+        if (!InputValidator.validateTodoText(sanitizedTitle)) {
+            toast.error('Invalid characters in title');
+            return;
+        }
+
+        if (sanitizedDescription && !InputValidator.validateTodoText(sanitizedDescription)) {
+            toast.error('Invalid characters in description');
+            return;
+        }
+
+        onAddTodo({ title: sanitizedTitle, description: sanitizedDescription });
         setTitle(t('todo.newTask'));
         setDescription("");
     }

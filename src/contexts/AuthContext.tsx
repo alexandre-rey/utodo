@@ -26,8 +26,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const profile = await authService.getProfile();
           setUser(profile);
         } catch (error) {
-          console.error('Failed to get user profile:', error);
+          console.error('Failed to get user profile on page load:', error);
+          // Clear invalid tokens
           authService.clearAuth();
+          setUser(null);
         }
       }
       setIsLoading(false);

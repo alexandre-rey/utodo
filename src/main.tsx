@@ -5,6 +5,10 @@ import './index.css'
 import './i18n'
 import { AppProvider } from './contexts/AppContext'
 import { routeTree } from './routeTree.gen'
+import { SecurityMiddleware } from './middleware/securityMiddleware'
+
+// Initialize security middleware on app startup
+SecurityMiddleware.initializeSecurity();
 
 // Create a new router instance
 const router = createRouter({ routeTree })
