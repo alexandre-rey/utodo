@@ -1,10 +1,8 @@
 import { type ApiError } from '@/types/api';
-import { TokenSecurity } from '@/utils/xssProtection';
+import { CSRFManager } from '@/utils/csrfManager';
 
 class ApiClient {
   private baseURL: string;
-  private accessToken: string | null = null;
-  private refreshToken: string | null = null;
   private refreshPromise: Promise<void> | null = null;
 
   constructor(baseURL?: string) {
@@ -23,7 +21,6 @@ class ApiClient {
     
     // Enforce HTTPS in production
     this.enforceHTTPS();
-    this.loadTokensFromStorage();
   }
 
   private enforceHTTPS(): void {
@@ -48,62 +45,50 @@ class ApiClient {
     }
   }
 
-  private loadTokensFromStorage() {
-    if (typeof window !== 'undefined') {
-      // Securely load and validate tokens from localStorage
-      this.accessToken = TokenSecurity.secureRetrieve('access_token');
-      this.refreshToken = TokenSecurity.secureRetrieve('refresh_token');
-    }
-  }
-
-  private saveTokensToStorage(accessToken: string, refreshToken: string) {
-    if (typeof window !== 'undefined') {
-      // Securely store and validate tokens in localStorage
-      const accessStored = TokenSecurity.secureStore('access_token', accessToken);
-      const refreshStored = TokenSecurity.secureStore('refresh_token', refreshToken);
-      
-      if (!accessStored || !refreshStored) {
-        console.error('Failed to store tokens securely - clearing existing tokens');
-        return;
-      }
-    }
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
-  }
-
-  private clearTokensFromStorage() {
-    // Clear localStorage tokens
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-    }
+  private async clearAuthState() {
+    // Clear CSRF token
+    CSRFManager.clearToken();
     
-    // Clear in-memory tokens
-    this.accessToken = null;
-    this.refreshToken = null;
+    // Call logout endpoint to clear httpOnly cookies
+    try {
+      await fetch(`${this.baseURL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: await CSRFManager.addCSRFHeader({
+          'Content-Type': 'application/json',
+        }),
+      });
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    }
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (!this.refreshToken) {
-      throw new Error('No refresh token available');
-    }
-    
-    const response = await fetch(`${this.baseURL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: this.refreshToken }),
-    });
+    try {
+      const response = await fetch(`${this.baseURL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: await CSRFManager.addCSRFHeader({
+          'Content-Type': 'application/json',
+        }),
+      });
 
-    if (!response.ok) {
-      console.error('Token refresh failed:', response.status, response.statusText);
-      this.clearTokensFromStorage();
-      throw new Error(`Token refresh failed: ${response.status}`);
-    }
+      if (!response.ok) {
+        console.error('Token refresh failed:', response.status, response.statusText);
+        await this.clearAuthState();
+        throw new Error(`Token refresh failed: ${response.status}`);
+      }
 
-    const data = await response.json();
-    this.saveTokensToStorage(data.access_token, data.refresh_token);
+      const data = await response.json();
+      
+      // Update CSRF token if provided
+      if (data.csrfToken) {
+        CSRFManager.setToken(data.csrfToken);
+      }
+    } catch (error) {
+      await this.clearAuthState();
+      throw error;
+    }
   }
 
   private async request<T>(
@@ -112,26 +97,25 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Add CSRF token to headers for state-changing operations
+    const needsCSRF = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method?.toUpperCase() || 'GET');
     let headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-
-    if (this.accessToken) {
-      headers = {
-        ...headers,
-        Authorization: `Bearer ${this.accessToken}`,
-      };
+    if (needsCSRF) {
+      headers = await CSRFManager.addCSRFHeader(headers);
     }
 
     let response = await fetch(url, {
       ...options,
       headers,
-credentials: 'include'
+      credentials: 'include', // Always include cookies
     });
 
-    if (response.status === 401 && this.refreshToken && endpoint !== '/auth/refresh') {
+    // Handle 401 with automatic token refresh
+    if (response.status === 401 && endpoint !== '/auth/refresh') {
       if (!this.refreshPromise) {
         this.refreshPromise = this.refreshAccessToken()
           .finally(() => {
@@ -141,15 +125,18 @@ credentials: 'include'
 
       await this.refreshPromise;
 
-      headers = {
-        ...headers,
-        Authorization: `Bearer ${this.accessToken}`,
-      };
+      // Update headers with new CSRF token if needed
+      if (needsCSRF) {
+        headers = await CSRFManager.addCSRFHeader({
+          'Content-Type': 'application/json',
+          ...options.headers,
+        });
+      }
 
       response = await fetch(url, {
         ...options,
         headers,
-  credentials: 'include'
+        credentials: 'include',
       });
     }
 
@@ -208,20 +195,18 @@ credentials: 'include'
     });
   }
 
-  public setTokens(accessToken: string, refreshToken: string) {
-    this.saveTokensToStorage(accessToken, refreshToken);
+  public async clearTokens() {
+    await this.clearAuthState();
   }
 
-  public clearTokens() {
-    this.clearTokensFromStorage();
-  }
-
-  public getAccessToken(): string | null {
-    return this.accessToken;
-  }
-
-  public isAuthenticated(): boolean {
-    return !!this.accessToken;
+  public async isAuthenticated(): Promise<boolean> {
+    // Check authentication by making a request to a protected endpoint
+    try {
+      await this.get('/auth/me');
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

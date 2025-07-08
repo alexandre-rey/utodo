@@ -12,6 +12,7 @@ import QuickAdd from "./components/QuickAdd";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useIsMobile } from "./hooks/useMediaQuery";
 import SimpleMobileView from "./components/SimpleMobileView";
+import DesktopDashboard from "./components/DesktopDashboard";
 import { useTodosContext } from "./contexts/TodosContext";
 import { useSettingsContext } from "./contexts/SettingsContext";
 import { useAuth } from "./contexts/AuthContext";
@@ -99,6 +100,8 @@ export default function App() {
             />
             
             <QuickAdd onAddTodo={(values) => handleAddTodo(values, settings)} />
+            
+            <DesktopDashboard />
           </>
         )}
         

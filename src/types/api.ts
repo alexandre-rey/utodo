@@ -101,14 +101,14 @@ export interface RefreshTokenDto {
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
   user: {
     id: string;
     email: string;
     firstName?: string;
     lastName?: string;
   };
+  csrfToken: string;
+  message?: string;
 }
 
 export interface TodosResponse {

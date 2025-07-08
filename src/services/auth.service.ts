@@ -3,6 +3,7 @@ import { type LoginDto, type RegisterDto, type AuthResponse, type User } from '@
 import { todoService } from './todo.service';
 import { settingsService } from './settings.service';
 import { SecurityMiddleware } from '@/middleware/securityMiddleware';
+import { CSRFManager } from '@/utils/csrfManager';
 
 class AuthService {
   public async login(credentials: LoginDto): Promise<AuthResponse> {
@@ -17,7 +18,12 @@ class AuthService {
     }
 
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    apiClient.setTokens(response.access_token, response.refresh_token);
+    
+    // Update CSRF token from response
+    if (response.csrfToken) {
+      CSRFManager.setToken(response.csrfToken);
+    }
+    
     return response;
   }
 
@@ -54,7 +60,10 @@ class AuthService {
     try {
       await apiClient.post('/auth/logout');
     } finally {
-      apiClient.clearTokens();
+      await apiClient.clearTokens();
+      // Reset sync flags
+      todoService.setSyncFlag(false);
+      settingsService.setSyncFlag(false);
     }
   }
 
@@ -63,24 +72,25 @@ class AuthService {
   }
 
   public async refreshToken(): Promise<void> {
-    const refreshToken = localStorage.getItem('refresh_token');
-    if (!refreshToken) {
-      throw new Error('No refresh token available');
-    }
-
-    const response = await apiClient.post<AuthResponse>('/auth/refresh', {
-      refreshToken,
-    });
+    // Token refresh is now handled automatically by the API client
+    // This method is kept for backward compatibility
+    const response = await apiClient.post<{ csrfToken?: string }>('/auth/refresh');
     
-    apiClient.setTokens(response.access_token, response.refresh_token);
+    // Update CSRF token if provided
+    if (response.csrfToken) {
+      CSRFManager.setToken(response.csrfToken);
+    }
   }
 
-  public isAuthenticated(): boolean {
+  public async isAuthenticated(): Promise<boolean> {
     return apiClient.isAuthenticated();
   }
 
-  public clearAuth(): void {
-    apiClient.clearTokens();
+  public async clearAuth(): Promise<void> {
+    await apiClient.clearTokens();
+    // Reset sync flags
+    todoService.setSyncFlag(false);
+    settingsService.setSyncFlag(false);
   }
 }
 

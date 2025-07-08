@@ -184,7 +184,7 @@ export class InputValidator {
 }
 
 /**
- * Token Security for localStorage
+ * Token Security for JWT validation (cookies are managed by server)
  */
 export class TokenSecurity {
   /**
@@ -207,43 +207,22 @@ export class TokenSecurity {
   }
 
   /**
-   * Securely store token in localStorage with validation
+   * Validate JWT token structure (for API responses)
    */
-  static secureStore(key: string, token: string): boolean {
-    if (!this.validateTokenFormat(token)) {
-      console.error('Invalid token format detected - possible XSS attempt');
+  static validateJWTResponse(response: any): boolean {
+    if (!response || typeof response !== 'object') {
       return false;
     }
 
-    try {
-      localStorage.setItem(key, token);
-      return true;
-    } catch (error) {
-      console.error('Failed to store token securely:', error);
+    // Check if response contains valid JWT tokens
+    if (response.access_token && !this.validateTokenFormat(response.access_token)) {
       return false;
     }
-  }
 
-  /**
-   * Securely retrieve token from localStorage with validation
-   */
-  static secureRetrieve(key: string): string | null {
-    try {
-      const token = localStorage.getItem(key);
-      if (!token) {
-        return null;
-      }
-
-      if (!this.validateTokenFormat(token)) {
-        console.error('Invalid token format in storage - removing for security');
-        localStorage.removeItem(key);
-        return null;
-      }
-
-      return token;
-    } catch (error) {
-      console.error('Failed to retrieve token securely:', error);
-      return null;
+    if (response.refresh_token && !this.validateTokenFormat(response.refresh_token)) {
+      return false;
     }
+
+    return true;
   }
 }
