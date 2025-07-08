@@ -41,7 +41,7 @@ export default function App() {
   } = useTodosContext();
 
   const { settings, handleSettingsChange } = useSettingsContext();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const {
     selectedTodo,
     setSelectedTodo,
@@ -89,6 +89,7 @@ export default function App() {
               setShowCompleted={setShowCompleted}
               completedCount={completedCount}
               user={user}
+              isLoading={isLoading}
               handleSignOut={logout}
               setIsAuthOpen={setIsAuthOpen}
               setIsSettingsOpen={setIsSettingsOpen}

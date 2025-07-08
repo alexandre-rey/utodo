@@ -46,21 +46,16 @@ class ApiClient {
   }
 
   private async clearAuthState() {
+    // Try to call logout endpoint, but don't fail if it doesn't work
+    try {
+      await this.post('/auth/logout');
+    } catch (error) {
+      console.warn('Server logout failed, clearing client state anyway:', error);
+      // Continue with client-side cleanup even if server logout fails
+    }
+    
     // Clear CSRF token
     CSRFManager.clearToken();
-    
-    // Call logout endpoint to clear httpOnly cookies
-    try {
-      await fetch(`${this.baseURL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: await CSRFManager.addCSRFHeader({
-          'Content-Type': 'application/json',
-        }),
-      });
-    } catch (error) {
-      console.error('Logout request failed:', error);
-    }
   }
 
   private async refreshAccessToken(): Promise<void> {
@@ -93,7 +88,8 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    skipAutoRefresh = false
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
@@ -114,8 +110,8 @@ class ApiClient {
       credentials: 'include', // Always include cookies
     });
 
-    // Handle 401 with automatic token refresh
-    if (response.status === 401 && endpoint !== '/auth/refresh') {
+    // Handle 401 with automatic token refresh (skip during initial auth check)
+    if (response.status === 401 && endpoint !== '/auth/refresh' && !skipAutoRefresh) {
       if (!this.refreshPromise) {
         this.refreshPromise = this.refreshAccessToken()
           .finally(() => {
@@ -162,7 +158,7 @@ class ApiClient {
     return response.json();
   }
 
-  public async get<T>(endpoint: string, params?: Record<string, unknown>): Promise<T> {
+  public async get<T>(endpoint: string, params?: Record<string, unknown>, skipAutoRefresh = false): Promise<T> {
     const url = new URL(`${this.baseURL}${endpoint}`);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -172,7 +168,7 @@ class ApiClient {
       });
     }
 
-    return this.request<T>(endpoint + (url.search ? `?${url.searchParams}` : ''));
+    return this.request<T>(endpoint + (url.search ? `?${url.searchParams}` : ''), {}, skipAutoRefresh);
   }
 
   public async post<T>(endpoint: string, data?: unknown): Promise<T> {
@@ -200,9 +196,14 @@ class ApiClient {
   }
 
   public async isAuthenticated(): Promise<boolean> {
+    // Check if there are cookies that might contain tokens
+    if (!document.cookie || !document.cookie.includes('access_token')) {
+      return false;
+    }
+    
     // Check authentication by making a request to a protected endpoint
     try {
-      await this.get('/auth/me');
+      await this.get('/auth/me', undefined, true); // Skip auto-refresh
       return true;
     } catch {
       return false;

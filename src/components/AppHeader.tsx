@@ -11,6 +11,7 @@ interface AppHeaderProps {
   setShowCompleted: (show: boolean) => void;
   completedCount: number;
   user: UserType | null;
+  isLoading: boolean;
   handleSignOut: () => void;
   setIsAuthOpen: (open: boolean) => void;
   setIsSettingsOpen: (open: boolean) => void;
@@ -23,6 +24,7 @@ export default function AppHeader({
   setShowCompleted,
   completedCount,
   user,
+  isLoading,
   handleSignOut,
   setIsAuthOpen,
   setIsSettingsOpen
@@ -56,7 +58,11 @@ export default function AppHeader({
         </Button>
 
         {/* User Menu */}
-        {user ? (
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin"></div>
+          </div>
+        ) : user ? (
           <div className="flex items-center gap-2">
             <span className="hidden sm:inline text-sm text-slate-600">
               {t('auth.hello', { name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email })}

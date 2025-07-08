@@ -17,6 +17,7 @@ import type { User as UserType } from '../types/api';
 
 interface MobileHeaderProps {
   user: UserType | null;
+  isLoading: boolean;
   completedCount: number;
   showCompleted: boolean;
   onToggleCompleted: () => void;
@@ -28,6 +29,7 @@ interface MobileHeaderProps {
 
 export default function MobileHeader({
   user,
+  isLoading,
   completedCount,
   showCompleted,
   onToggleCompleted,
@@ -170,7 +172,12 @@ export default function MobileHeader({
                 </button>
 
                 {/* Auth Actions */}
-                {user ? (
+                {isLoading ? (
+                  <div className="w-full flex items-center justify-center px-4 py-2 text-sm text-gray-600">
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-3"></div>
+                    {t('auth.pleaseWait')}
+                  </div>
+                ) : user ? (
                   <button
                     onClick={() => handleMenuAction(onSignOut)}
                     className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 active:bg-red-100"

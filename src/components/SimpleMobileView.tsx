@@ -35,7 +35,7 @@ export default function SimpleMobileView() {
   } = useTodosContext();
   
   const { statuses, settings } = useSettingsContext();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { 
     selectedTodo, 
     setSelectedTodo, 
@@ -93,6 +93,7 @@ export default function SimpleMobileView() {
       <div className="min-h-screen w-screen bg-gray-50 overflow-x-hidden">
         <MobileHeader
           user={user}
+          isLoading={isLoading}
           completedCount={completedCount}
           showCompleted={showCompleted}
           onToggleCompleted={() => setShowCompleted(!showCompleted)}

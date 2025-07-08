@@ -41,26 +41,10 @@ export class CSRFManager {
       return metaToken;
     }
 
-    // If not in meta tag, fetch from server
-    try {
-      const response = await fetch('/auth/csrf-token', {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch CSRF token: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.csrf_token || data.csrfToken || '';
-    } catch (error) {
-      console.error('Failed to fetch CSRF token:', error);
-      return '';
-    }
+    // If no meta tag and no cached token, return empty string
+    // CSRF token should be set during login via setToken()
+    console.warn('No CSRF token available - this should be set during login');
+    return '';
   }
 
   /**
@@ -68,10 +52,16 @@ export class CSRFManager {
    */
   static async addCSRFHeader(headers: HeadersInit = {}): Promise<HeadersInit> {
     const token = await this.getCSRFToken();
-    return {
-      ...headers,
-      'X-CSRF-Token': token,
-    };
+    
+    // Only add the header if we have a token
+    if (token) {
+      return {
+        ...headers,
+        'X-CSRF-Token': token,
+      };
+    }
+    
+    return headers;
   }
 
   /**

@@ -67,8 +67,8 @@ class AuthService {
     }
   }
 
-  public async getProfile(): Promise<User> {
-    return apiClient.get<User>('/auth/profile');
+  public async getProfile(skipAutoRefresh = false): Promise<User> {
+    return apiClient.get<User>('/auth/profile', undefined, skipAutoRefresh);
   }
 
   public async refreshToken(): Promise<void> {

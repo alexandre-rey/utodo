@@ -22,14 +22,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Check authentication status by trying to get profile
-        // This will automatically handle cookie validation
-        const profile = await authService.getProfile();
-        setUser(profile);
-      } catch (error) {
-        console.error('Failed to get user profile on page load:', error);
-        // Clear auth state - cookies will be cleared by server
-        await authService.clearAuth();
+        // Only check authentication if there are cookies that might contain tokens
+        if (document.cookie && document.cookie.includes('access_token')) {
+          // Check authentication status by trying to get profile
+          // Skip auto-refresh to avoid unnecessary token refresh attempts
+          const profile = await authService.getProfile(true);
+          setUser(profile);
+        } else {
+          // No cookies, user is not authenticated
+          setUser(null);
+        }
+      } catch {
+        // If profile request fails, user is not authenticated
         setUser(null);
       } finally {
         setIsLoading(false);
