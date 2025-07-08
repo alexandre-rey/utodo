@@ -133,6 +133,22 @@ export default function UpgradeDialog({
   // This would typically come from your Stripe configuration
   const PREMIUM_PRICE_ID = 'prod_Sciw3hP4PkkysL'; // Replace with actual Stripe price ID
 
+  const handleUpgrade = async () => {
+    setIsLoading(true);
+    try {
+      await onUpgrade(PREMIUM_PRICE_ID);
+      // The function will redirect to Stripe Checkout
+      // No need to handle success here as user will be redirected
+    } catch (error) {
+      console.error('Upgrade failed:', error);
+      toast.error(t('subscription.upgradeFailed'), {
+        description: error instanceof Error ? error.message : t('subscription.upgradeFailedDesc')
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const features = [
     t('subscription.feature.unlimitedStatuses'),
     t('subscription.feature.prioritySupport'),

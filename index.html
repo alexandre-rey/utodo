@@ -6,24 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>µTodo - A Simple Way to Manage Todos</title>
     
-    <!-- CSRF Token for secure authentication -->
-    <meta name="csrf-token" content="{% csrf_token %}" />
+    <!-- CSRF Token for secure authentication (populated by server) -->
+    <meta name="csrf-token" content="" />
     
-    <!-- Security Headers -->
-    <!-- CSP temporarily disabled to debug CORS login issue -->
-    <!--
+    <!-- Security Headers - Content Security Policy -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://js.stripe.com;
-      style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://*.stripe.com;
+      script-src 'self' 'nonce-VITE_CSP_NONCE' https://js.stripe.com https://m.stripe.network https://m.stripe.com;
+      script-src-elem 'self' 'nonce-VITE_CSP_NONCE' https://js.stripe.com https://m.stripe.network https://m.stripe.com;
+      style-src 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network https://m.stripe.com;
+      style-src-elem 'self' 'unsafe-inline' https://js.stripe.com https://m.stripe.network https://m.stripe.com;
       img-src 'self' data: https:;
-      connect-src 'self' https://api.todo-app.com https://localhost:3000 http://localhost:3000 https://api.stripe.com https://*.stripe.com;
-      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://api.todo-app.com https://localhost:3000 http://localhost:3000 https://api.stripe.com https://m.stripe.network https://m.stripe.com https://q.stripe.com;
+      font-src 'self' https://js.stripe.com;
       object-src 'none';
       base-uri 'self';
-      form-action 'self' https://*.stripe.com;
-      frame-ancestors 'self';
-      frame-src 'self' https://*.stripe.com https://js.stripe.com;
+      form-action 'self';
+      frame-ancestors 'none';
+      frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com;
+      upgrade-insecure-requests;
+      require-trusted-types-for 'script';
     ">
     -->
     
@@ -36,7 +38,7 @@
       microphone=(),
       camera=(),
       fullscreen=(self),
-      payment=()
+      payment=(self)
     ">
   </head>
   <body>

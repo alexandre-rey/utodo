@@ -43,22 +43,19 @@ export function useSubscription() {
   const isPremium = subscriptionService.isPremiumPlan(subscription);
   const canCreateMoreStatuses = subscriptionService.canCreateCustomStatuses(statusLimits);
 
-  const createSubscription = async (priceId: string, paymentMethodId?: string) => {
+  const createCheckoutSession = async (priceId: string) => {
     try {
-      const { clientSecret, subscriptionId } = await subscriptionService.createSubscription(priceId, paymentMethodId);
+      const response = await subscriptionService.createCheckoutSession(priceId);
+      const { checkoutUrl } = response;
       
-      if (paymentMethodId) {
-        // Payment method provided, subscription should be created and confirmed
-        console.log('Subscription created with payment method:', { subscriptionId });
-        // Refresh subscription data to get updated status
-        await loadSubscriptionData();
-        return { success: true, subscriptionId };
-      } else {
-        // Return client secret for manual payment confirmation
-        return { clientSecret, subscriptionId };
+      if (!checkoutUrl) {
+        throw new Error('Backend did not return checkout URL');
       }
+      
+      // Redirect to Stripe Checkout
+      window.location.href = checkoutUrl;
     } catch (error) {
-      console.error('Failed to create subscription:', error);
+      console.error('Failed to create checkout session:', error);
       throw error;
     }
   };
@@ -97,7 +94,7 @@ export function useSubscription() {
     isLoading,
     isPremium,
     canCreateMoreStatuses,
-    createSubscription,
+    createCheckoutSession,
     cancelSubscription,
     reactivateSubscription,
     refreshData: loadSubscriptionData,

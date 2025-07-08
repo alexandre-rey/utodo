@@ -42,7 +42,7 @@ export const loadTodos = (): Todo[] => {
         if (!todos) {
             const oldData = localStorage.getItem(TODOS_KEY);
             if (oldData) {
-                console.log("Migrating todos to encrypted storage...");
+                console.warn("Migrating todos to encrypted storage...");
                 todos = JSON.parse(oldData);
                 if (todos && todos.length > 0) {
                     // Save to encrypted storage and remove old data

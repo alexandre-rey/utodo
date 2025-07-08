@@ -3,30 +3,21 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Check, Calendar, Square, CheckSquare } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import { useTodosContext } from '../contexts/TodosContext';
+import { useAppUIContext } from '../contexts/AppContext';
 
-interface CalendarViewProps {
-    todos: Todo[];
-    setSelectedTodo: (todo: Todo | null) => void;
-    onTodoCompletionToggle: (todoId: string) => void;
-    showCompleted: boolean;
-    searchQuery: string;
-    isSelectionMode: boolean;
-    selectedTodos: Set<string>;
-    onTodoSelection: (todoId: string, isSelected: boolean) => void;
-    onEnterSelectionMode: () => void;
-}
-
-export default function CalendarView({ 
-    todos, 
-    setSelectedTodo, 
-    onTodoCompletionToggle, 
-    showCompleted, 
-    searchQuery,
-    isSelectionMode,
-    selectedTodos,
-    onTodoSelection,
-    onEnterSelectionMode
-}: CalendarViewProps) {
+export default function CalendarView() {
+    const { 
+        todos, 
+        handleTodoCompletionToggle, 
+        showCompleted, 
+        searchQuery,
+        isSelectionMode,
+        selectedTodos,
+        handleTodoSelection,
+        setIsSelectionMode
+    } = useTodosContext();
+    const { setSelectedTodo } = useAppUIContext();
     const { t } = useTranslation();
     // Filter todos based on search and completion
     const filteredTodos = todos.filter(todo => {
@@ -106,7 +97,7 @@ export default function CalendarView({
                                         }`}
                                         onClick={() => {
                                             if (isSelectionMode) {
-                                                onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                                handleTodoSelection(todo.id, !selectedTodos.has(todo.id));
                                             } else {
                                                 setSelectedTodo(todo);
                                             }
@@ -114,8 +105,8 @@ export default function CalendarView({
                                         onContextMenu={(e) => {
                                             if (!isSelectionMode) {
                                                 e.preventDefault();
-                                                onEnterSelectionMode();
-                                                onTodoSelection(todo.id, true);
+                                                setIsSelectionMode(true);
+                                                handleTodoSelection(todo.id, true);
                                             }
                                         }}
                                     >
@@ -147,7 +138,7 @@ export default function CalendarView({
                                                     className="flex-shrink-0 transition-all duration-200 border-0 shadow-sm hover:shadow-md hover:bg-slate-100"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        onTodoCompletionToggle(todo.id);
+                                                        handleTodoCompletionToggle(todo.id);
                                                     }}
                                                 >
                                                     <Check className="h-4 w-4" />
@@ -180,7 +171,7 @@ export default function CalendarView({
                                         } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'}`}
                                         onClick={() => {
                                             if (isSelectionMode) {
-                                                onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                                handleTodoSelection(todo.id, !selectedTodos.has(todo.id));
                                             } else {
                                                 setSelectedTodo(todo);
                                             }
@@ -188,8 +179,8 @@ export default function CalendarView({
                                         onContextMenu={(e) => {
                                             if (!isSelectionMode) {
                                                 e.preventDefault();
-                                                onEnterSelectionMode();
-                                                onTodoSelection(todo.id, true);
+                                                setIsSelectionMode(true);
+                                                handleTodoSelection(todo.id, true);
                                             }
                                         }}
                                     >
@@ -222,7 +213,7 @@ export default function CalendarView({
                                                     }`}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        onTodoCompletionToggle(todo.id);
+                                                        handleTodoCompletionToggle(todo.id);
                                                     }}
                                                 >
                                                     <Check className="h-4 w-4" />
@@ -252,7 +243,7 @@ export default function CalendarView({
                                     } ${todo.completed ? 'opacity-70 bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-white'}`}
                                     onClick={() => {
                                         if (isSelectionMode) {
-                                            onTodoSelection(todo.id, !selectedTodos.has(todo.id));
+                                            handleTodoSelection(todo.id, !selectedTodos.has(todo.id));
                                         } else {
                                             setSelectedTodo(todo);
                                         }
@@ -260,8 +251,8 @@ export default function CalendarView({
                                     onContextMenu={(e) => {
                                         if (!isSelectionMode) {
                                             e.preventDefault();
-                                            onEnterSelectionMode();
-                                            onTodoSelection(todo.id, true);
+                                            setIsSelectionMode(true);
+                                            handleTodoSelection(todo.id, true);
                                         }
                                     }}
                                 >
@@ -294,7 +285,7 @@ export default function CalendarView({
                                                 }`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onTodoCompletionToggle(todo.id);
+                                                    handleTodoCompletionToggle(todo.id);
                                                 }}
                                             >
                                                 <Check className="h-4 w-4" />

@@ -13,7 +13,7 @@ export function useTodos() {
       // First, get the first page to know the total count
       const firstPage = await todoService.getTodos({ page: 1, limit: 100 });
       
-      let allTodos = [...firstPage.data];
+      const allTodos = [...firstPage.data];
       
       // If there are more pages, fetch them all
       if (firstPage.meta.totalPages > 1) {

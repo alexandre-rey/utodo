@@ -87,7 +87,6 @@ export class CookieAuth {
     const refreshToken = localStorage.getItem('refresh_token');
     
     if (accessToken || refreshToken) {
-      console.log('Migrating authentication tokens to secure storage...');
       
       // Clear old tokens from localStorage
       localStorage.removeItem('access_token');

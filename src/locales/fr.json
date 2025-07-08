@@ -1,4 +1,10 @@
 {
+  "common": {
+    "cancel": "Annuler",
+    "loading": "Chargement...",
+    "yes": "Oui",
+    "no": "Non"
+  },
   "app": {
     "title": "µTodo",
     "tagline": "Un moyen simple de gérer vos tâches",
@@ -57,7 +63,8 @@
     "taskCompleted": "Cette tâche a été terminée",
     "taskPending": "Cette tâche est toujours en attente",
     "newTask": "Nouvelle tâche",
-    "newStatus": "Nouveau statut"
+    "newStatus": "Nouveau statut",
+    "add": "Ajouter"
   },
   "actions": {
     "add": "Ajouter",
@@ -74,7 +81,14 @@
     "complete": "Terminer",
     "selected": "sélectionné(e)s",
     "status": "Statut",
-    "statusColon": "Statut :"
+    "statusColon": "Statut :",
+    "back": "Retour",
+    "markComplete": "Marquer comme terminé",
+    "markIncomplete": "Marquer comme non terminé",
+    "move": "Déplacer",
+    "addNew": "Ajouter nouveau",
+    "changed": "Modifié",
+    "undo": "Annuler"
   },
   "dialogs": {
     "addTodo": "Ajouter une tâche",
@@ -100,7 +114,12 @@
     "whatShouldBeDone": "Que faut-il faire",
     "addDescriptionOptional": "Ajouter une description (optionnel)...",
     "searchTodosShortcut": "Rechercher des tâches... (Ctrl+K)",
-    "updateStatus": "Mettre à jour le statut"
+    "updateStatus": "Mettre à jour le statut",
+    "quickStatusChange": "Changement rapide de statut",
+    "high": "Élevé",
+    "medium": "Moyen",
+    "low": "Faible",
+    "normal": "Normal"
   },
   "messages": {
     "noTodos": "Aucune tâche trouvée",
@@ -173,6 +192,129 @@
       "prioritySupport": "Support client prioritaire",
       "advancedFeatures": "Fonctionnalités avancées et intégrations",
       "dataBackup": "Sauvegarde automatique des données"
+    },
+    "completePayment": "Finaliser le paiement",
+    "paymentFailed": "Échec du paiement",
+    "paymentSuccess": "Paiement réussi",
+    "payNow": "Payer maintenant",
+    "upgradeSuccess": "Mise à niveau réussie",
+    "paymentCancelled": "Paiement annulé",
+    "paymentSuccessMessage": "Votre paiement a été traité avec succès ! Vous avez maintenant accès aux fonctionnalités premium.",
+    "paymentCancelledMessage": "Votre paiement a été annulé. Aucun frais n'a été appliqué à votre compte.",
+    "welcomeToPremium": "Bienvenue dans Premium ! Profitez de colonnes de statut personnalisées illimitées.",
+    "noChargesApplied": "Aucun frais n'a été appliqué à votre compte.",
+    "continueToDashboard": "Continuer vers le tableau de bord",
+    "backToDashboard": "Retour au tableau de bord",
+    "tryAgain": "Réessayer",
+    "management": "Gestion de l'abonnement",
+    "currentPlan": "Plan actuel",
+    "status": "Statut",
+    "active": "Actif",
+    "cancelled": "Annulé",
+    "pastDue": "En retard",
+    "free": "Gratuit",
+    "activeDesc": "Votre abonnement premium est actif et toutes les fonctionnalités sont disponibles.",
+    "cancelledDesc": "Votre abonnement a été annulé mais reste actif jusqu'à la fin de votre période de facturation.",
+    "pastDueDesc": "Votre paiement est en retard. Veuillez mettre à jour votre méthode de paiement pour continuer à utiliser les fonctionnalités premium.",
+    "freeDesc": "Vous êtes actuellement sur le plan gratuit avec des fonctionnalités limitées.",
+    "cancel": "Annuler l'abonnement",
+    "confirmCancel": "Annuler l'abonnement ?",
+    "cancelWarning": "Êtes-vous sûr de vouloir annuler votre abonnement ? Vous perdrez l'accès aux fonctionnalités premium à la fin de votre période de facturation actuelle.",
+    "confirmCancelButton": "Oui, annuler",
+    "reactivate": "Réactiver l'abonnement",
+    "cancelSuccess": "Abonnement annulé avec succès. Vous conserverez l'accès jusqu'à la fin de votre période de facturation.",
+    "cancelError": "Échec de l'annulation de l'abonnement. Veuillez réessayer.",
+    "reactivateSuccess": "Abonnement réactivé avec succès !",
+    "reactivateError": "Échec de la réactivation de l'abonnement. Veuillez réessayer."
+  },
+  "dashboard": {
+    "totalTodos": "Total",
+    "completedToday": "Aujourd'hui",
+    "progress": "Progrès",
+    "overallProgress": "Progrès général",
+    "completed": "terminé(s)",
+    "statusOverview": "Aperçu des statuts",
+    "andMore": "+ {{count}} de plus",
+    "noTodos": "Aucune tâche",
+    "noTodosInStatus": "Aucune tâche dans {{status}}"
+  },
+  "legal": {
+    "contact": {
+      "title": "Contact",
+      "email": "support@utodo.com",
+      "supportHours": "Heures de support",
+      "hours": "Lundi au vendredi, 9h - 18h (CET)"
+    },
+    "cgu": {
+      "title": "Conditions Générales d'Utilisation",
+      "lastUpdated": "Dernière mise à jour",
+      "section1": {
+        "title": "1. Acceptation des conditions",
+        "content": "En accédant et en utilisant µTodo, vous acceptez et convenez d'être lié par les termes et dispositions de cet accord. Si vous n'acceptez pas de respecter ce qui précède, veuillez ne pas utiliser ce service."
+      },
+      "section2": {
+        "title": "2. Description du service",
+        "content": "µTodo est une application de gestion de tâches qui permet aux utilisateurs de créer, organiser et suivre leurs tâches quotidiennes et projets. Le service est fourni 'en l'état' et peut être modifié ou interrompu à tout moment."
+      },
+      "section3": {
+        "title": "3. Comptes utilisateur",
+        "content": "Les utilisateurs sont responsables du maintien de la confidentialité de leurs informations de compte et mot de passe. Vous acceptez la responsabilité de toutes les activités qui se produisent sous votre compte."
+      },
+      "section4": {
+        "title": "4. Confidentialité et protection des données",
+        "content": "Nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Toutes les données sont stockées de manière sécurisée et ne sont pas partagées avec des tiers sans votre consentement."
+      },
+      "section5": {
+        "title": "5. Limitation de responsabilité",
+        "content": "µTodo ne peut être tenu responsable de tout dommage direct, indirect, accessoire, spécial ou consécutif résultant de l'utilisation ou de l'incapacité d'utiliser le service."
+      },
+      "section6": {
+        "title": "6. Modification des conditions",
+        "content": "Nous nous réservons le droit de modifier ces conditions à tout moment. Les utilisateurs seront informés des changements importants par email ou via l'application."
+      },
+      "section7": {
+        "title": "7. Droit applicable",
+        "content": "Ces conditions sont régies et interprétées conformément aux lois de la France, sans égard à ses dispositions de conflit de lois."
+      }
+    },
+    "cgv": {
+      "title": "Conditions Générales de Vente",
+      "lastUpdated": "Dernière mise à jour",
+      "section1": {
+        "title": "1. Informations générales",
+        "content": "Ces Conditions Générales de Vente régissent l'achat d'abonnements premium pour µTodo. En achetant un abonnement premium, vous acceptez ces conditions."
+      },
+      "section2": {
+        "title": "2. Fonctionnalités premium",
+        "content": "L'abonnement premium comprend les fonctionnalités suivantes :",
+        "item1": "Colonnes de statut personnalisées illimitées",
+        "item2": "Support client prioritaire",
+        "item3": "Fonctionnalités avancées et intégrations"
+      },
+      "section3": {
+        "title": "3. Tarification et paiement",
+        "content": "Les abonnements premium sont facturés mensuellement à 1,99€ par mois. Tous les paiements sont traités de manière sécurisée via Stripe. Les prix incluent les taxes applicables."
+      },
+      "section4": {
+        "title": "4. Gestion de l'abonnement",
+        "content": "Vous pouvez annuler votre abonnement à tout moment via les paramètres de votre compte. L'annulation prendra effet à la fin de votre période de facturation actuelle."
+      },
+      "section5": {
+        "title": "5. Politique de remboursement",
+        "content": "Nous offrons une garantie de remboursement de 14 jours pour les nouveaux abonnés. Les demandes de remboursement doivent être soumises dans les 14 jours suivant l'achat initial."
+      },
+      "section6": {
+        "title": "6. Disponibilité du service",
+        "content": "Nous nous efforçons de maintenir 99,9% de disponibilité mais ne pouvons garantir un service ininterrompu. La maintenance programmée sera annoncée à l'avance lorsque possible."
+      },
+      "section7": {
+        "title": "7. Modifications des fonctionnalités premium",
+        "content": "Nous pouvons ajouter, modifier ou supprimer des fonctionnalités premium avec un préavis raisonnable. Les abonnés existants seront informés des changements importants."
+      },
+      "section8": {
+        "title": "8. Résolution des litiges",
+        "content": "Tout litige découlant des abonnements premium sera résolu par arbitrage contraignant conformément au droit français."
+      }
     }
   }
 }

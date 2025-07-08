@@ -21,16 +21,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      if (authService.isAuthenticated()) {
-        try {
-          const profile = await authService.getProfile();
+      try {
+        // Only check authentication if there are cookies that might contain tokens
+        if (document.cookie && document.cookie.includes('access_token')) {
+          // Check authentication status by trying to get profile
+          // Skip auto-refresh to avoid unnecessary token refresh attempts
+          const profile = await authService.getProfile(true);
           setUser(profile);
-        } catch (error) {
-          console.error('Failed to get user profile:', error);
-          authService.clearAuth();
+        } else {
+          // No cookies, user is not authenticated
+          setUser(null);
         }
+      } catch {
+        // If profile request fails, user is not authenticated
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     initializeAuth();
@@ -39,10 +46,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: LoginDto) => {
     setIsLoading(true);
     try {
-      await authService.login(credentials);
-      // Get the full user profile after login
-      const profile = await authService.getProfile();
-      setUser(profile);
+      const loginResponse = await authService.login(credentials);
+      // Login response might contain user data directly
+      if (loginResponse.user) {
+        setUser(loginResponse.user);
+      } else {
+        // Fallback: get profile from server
+        const profile = await authService.getProfile();
+        setUser(profile);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       await authService.logout();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still clear user state even if server logout fails
       setUser(null);
     } finally {
       setIsLoading(false);

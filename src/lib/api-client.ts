@@ -1,10 +1,8 @@
 import { type ApiError } from '@/types/api';
-import { CookieAuth, CSRFProtection } from '@/utils/cookieAuth';
+import { CSRFManager } from '@/utils/csrfManager';
 
 class ApiClient {
   private baseURL: string;
-  private accessToken: string | null = null;
-  private refreshToken: string | null = null;
   private refreshPromise: Promise<void> | null = null;
 
   constructor(baseURL?: string) {
@@ -23,7 +21,6 @@ class ApiClient {
     
     // Enforce HTTPS in production
     this.enforceHTTPS();
-    this.loadTokensFromStorage();
   }
 
   private enforceHTTPS(): void {
@@ -48,87 +45,73 @@ class ApiClient {
     }
   }
 
-  private loadTokensFromStorage() {
-    if (typeof window !== 'undefined') {
-      // Migration: Move existing tokens from localStorage
-      CookieAuth.migrateTokensFromStorage();
-      
-      // For backward compatibility during transition
-      this.accessToken = localStorage.getItem('access_token');
-      this.refreshToken = localStorage.getItem('refresh_token');
+  private async clearAuthState() {
+    // Try to call logout endpoint, but don't fail if it doesn't work
+    try {
+      await this.post('/auth/logout');
+    } catch (error) {
+      console.warn('Server logout failed, clearing client state anyway:', error);
+      // Continue with client-side cleanup even if server logout fails
     }
-  }
-
-  private saveTokensToStorage(accessToken: string, refreshToken: string) {
-    // In a secure implementation, tokens would be set as httpOnly cookies by the server
-    // For now, we use localStorage but log a security warning
-    console.warn('Security Warning: Tokens should be stored in httpOnly cookies by the server');
     
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh_token', refreshToken);
-    }
-    this.accessToken = accessToken;
-    this.refreshToken = refreshToken;
-  }
-
-  private clearTokensFromStorage() {
-    // Clear both cookie and localStorage tokens
-    CookieAuth.clearAuth();
-    this.accessToken = null;
-    this.refreshToken = null;
+    // Clear CSRF token
+    CSRFManager.clearToken();
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (!this.refreshToken) {
-      throw new Error('No refresh token available');
+    try {
+      const response = await fetch(`${this.baseURL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: await CSRFManager.addCSRFHeader({
+          'Content-Type': 'application/json',
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Token refresh failed:', response.status, response.statusText);
+        await this.clearAuthState();
+        throw new Error(`Token refresh failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Update CSRF token if provided
+      if (data.csrfToken) {
+        CSRFManager.setToken(data.csrfToken);
+      }
+    } catch (error) {
+      await this.clearAuthState();
+      throw error;
     }
-
-    const response = await fetch(`${this.baseURL}/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: this.refreshToken }),
-    });
-
-    if (!response.ok) {
-      this.clearTokensFromStorage();
-      throw new Error('Token refresh failed');
-    }
-
-    const data = await response.json();
-    this.saveTokensToStorage(data.access_token, data.refresh_token);
   }
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    skipAutoRefresh = false
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    // Add CSRF token to headers for state-changing operations
+    const needsCSRF = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(options.method?.toUpperCase() || 'GET');
     let headers: HeadersInit = {
       'Content-Type': 'application/json',
       ...options.headers,
     };
 
-    // Add CSRF protection for cookie-based auth
-    headers = CSRFProtection.addToHeaders(headers as Record<string, string>);
-
-    if (this.accessToken) {
-      headers = {
-        ...headers,
-        Authorization: `Bearer ${this.accessToken}`,
-      };
+    if (needsCSRF) {
+      headers = await CSRFManager.addCSRFHeader(headers);
     }
 
     let response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Include httpOnly cookies in requests
+      credentials: 'include', // Always include cookies
     });
 
-    if (response.status === 401 && this.refreshToken && endpoint !== '/auth/refresh') {
+    // Handle 401 with automatic token refresh (skip during initial auth check)
+    if (response.status === 401 && endpoint !== '/auth/refresh' && !skipAutoRefresh) {
       if (!this.refreshPromise) {
         this.refreshPromise = this.refreshAccessToken()
           .finally(() => {
@@ -138,15 +121,18 @@ class ApiClient {
 
       await this.refreshPromise;
 
-      headers = {
-        ...headers,
-        Authorization: `Bearer ${this.accessToken}`,
-      };
+      // Update headers with new CSRF token if needed
+      if (needsCSRF) {
+        headers = await CSRFManager.addCSRFHeader({
+          'Content-Type': 'application/json',
+          ...options.headers,
+        });
+      }
 
       response = await fetch(url, {
         ...options,
         headers,
-        credentials: 'include', // Include httpOnly cookies in requests
+        credentials: 'include',
       });
     }
 
@@ -172,7 +158,7 @@ class ApiClient {
     return response.json();
   }
 
-  public async get<T>(endpoint: string, params?: Record<string, unknown>): Promise<T> {
+  public async get<T>(endpoint: string, params?: Record<string, unknown>, skipAutoRefresh = false): Promise<T> {
     const url = new URL(`${this.baseURL}${endpoint}`);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -182,7 +168,7 @@ class ApiClient {
       });
     }
 
-    return this.request<T>(endpoint + (url.search ? `?${url.searchParams}` : ''));
+    return this.request<T>(endpoint + (url.search ? `?${url.searchParams}` : ''), {}, skipAutoRefresh);
   }
 
   public async post<T>(endpoint: string, data?: unknown): Promise<T> {
@@ -205,21 +191,23 @@ class ApiClient {
     });
   }
 
-  public setTokens(accessToken: string, refreshToken: string) {
-    this.saveTokensToStorage(accessToken, refreshToken);
+  public async clearTokens() {
+    await this.clearAuthState();
   }
 
-  public clearTokens() {
-    this.clearTokensFromStorage();
-  }
-
-  public getAccessToken(): string | null {
-    return this.accessToken;
-  }
-
-  public isAuthenticated(): boolean {
-    // Check both localStorage (for backward compatibility) and cookie-based auth
-    return !!this.accessToken || CookieAuth.isAuthenticated();
+  public async isAuthenticated(): Promise<boolean> {
+    // Check if there are cookies that might contain tokens
+    if (!document.cookie || !document.cookie.includes('access_token')) {
+      return false;
+    }
+    
+    // Check authentication by making a request to a protected endpoint
+    try {
+      await this.get('/auth/me', undefined, true); // Skip auto-refresh
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

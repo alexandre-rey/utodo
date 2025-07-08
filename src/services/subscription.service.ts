@@ -48,9 +48,14 @@ class SubscriptionService {
     }
   }
 
-  public async createSubscription(priceId: string, paymentMethodId?: string): Promise<CreateSubscriptionResponse> {
-    const createDto: CreateSubscriptionDto = { priceId, paymentMethodId };
-    return await apiClient.post<CreateSubscriptionResponse>('/subscription', createDto);
+  public async createSubscription(priceId: string): Promise<{ clientSecret: string, subscriptionId: string }> {
+    const createDto: CreateSubscriptionDto = { priceId };
+    return await apiClient.post<{ clientSecret: string, subscriptionId: string }>('/subscription', createDto);
+  }
+
+  public async createCheckoutSession(priceId: string): Promise<{ checkoutUrl: string }> {
+    const createDto: CreateSubscriptionDto = { priceId };
+    return await apiClient.post<{ checkoutUrl: string }>('/subscription/checkout', createDto);
   }
 
   public async cancelSubscription(): Promise<void> {

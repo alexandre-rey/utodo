@@ -1,4 +1,10 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "yes": "Yes",
+    "no": "No"
+  },
   "app": {
     "title": "µTodo",
     "tagline": "A simple way to manage todos",
@@ -57,7 +63,8 @@
     "taskCompleted": "This task has been completed",
     "taskPending": "This task is still pending",
     "newTask": "New task",
-    "newStatus": "New Status"
+    "newStatus": "New Status",
+    "add": "Add"
   },
   "actions": {
     "add": "Add",
@@ -74,7 +81,14 @@
     "complete": "Complete",
     "selected": "selected",
     "status": "Status",
-    "statusColon": "Status:"
+    "statusColon": "Status:",
+    "back": "Back",
+    "markComplete": "Mark complete",
+    "markIncomplete": "Mark incomplete",
+    "move": "Move",
+    "addNew": "Add new",
+    "changed": "Changed",
+    "undo": "Undo"
   },
   "dialogs": {
     "addTodo": "Add Todo",
@@ -100,7 +114,12 @@
     "whatShouldBeDone": "What should be done",
     "addDescriptionOptional": "Add description (optional)...",
     "searchTodosShortcut": "Search todos... (Ctrl+K)",
-    "updateStatus": "Update status"
+    "updateStatus": "Update status",
+    "quickStatusChange": "Quick status change",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "normal": "Normal"
   },
   "messages": {
     "noTodos": "No todos found",
@@ -173,6 +192,129 @@
       "prioritySupport": "Priority customer support",
       "advancedFeatures": "Advanced features & integrations",
       "dataBackup": "Automatic data backup"
+    },
+    "completePayment": "Complete Payment",
+    "paymentFailed": "Payment Failed",
+    "paymentSuccess": "Payment Successful",
+    "payNow": "Pay Now",
+    "upgradeSuccess": "Upgrade Successful",
+    "paymentCancelled": "Payment Cancelled",
+    "paymentSuccessMessage": "Your payment was processed successfully! You now have access to premium features.",
+    "paymentCancelledMessage": "Your payment was cancelled. No charges were applied to your account.",
+    "welcomeToPremium": "Welcome to Premium! Enjoy unlimited custom status columns.",
+    "noChargesApplied": "No charges were applied to your account.",
+    "continueToDashboard": "Continue to Dashboard",
+    "backToDashboard": "Back to Dashboard",
+    "tryAgain": "Try Again",
+    "management": "Subscription Management",
+    "currentPlan": "Current Plan",
+    "status": "Status",
+    "active": "Active",
+    "cancelled": "Cancelled",
+    "pastDue": "Past Due",
+    "free": "Free",
+    "activeDesc": "Your premium subscription is active and all features are available.",
+    "cancelledDesc": "Your subscription has been cancelled but remains active until the end of your billing period.",
+    "pastDueDesc": "Your payment is past due. Please update your payment method to continue using premium features.",
+    "freeDesc": "You're currently on the free plan with limited features.",
+    "cancel": "Cancel Subscription",
+    "confirmCancel": "Cancel Subscription?",
+    "cancelWarning": "Are you sure you want to cancel your subscription? You'll lose access to premium features at the end of your current billing period.",
+    "confirmCancelButton": "Yes, Cancel",
+    "reactivate": "Reactivate Subscription",
+    "cancelSuccess": "Subscription canceled successfully. You'll retain access until the end of your billing period.",
+    "cancelError": "Failed to cancel subscription. Please try again.",
+    "reactivateSuccess": "Subscription reactivated successfully!",
+    "reactivateError": "Failed to reactivate subscription. Please try again."
+  },
+  "dashboard": {
+    "totalTodos": "Total",
+    "completedToday": "Today",
+    "progress": "Progress",
+    "overallProgress": "Overall Progress",
+    "completed": "completed",
+    "statusOverview": "Status Overview",
+    "andMore": "+ {{count}} more",
+    "noTodos": "No todos",
+    "noTodosInStatus": "No todos in {{status}}"
+  },
+  "legal": {
+    "contact": {
+      "title": "Contact",
+      "email": "support@utodo.com",
+      "supportHours": "Support Hours",
+      "hours": "Monday to Friday, 9 AM - 6 PM (CET)"
+    },
+    "cgu": {
+      "title": "Terms and Conditions",
+      "lastUpdated": "Last updated",
+      "section1": {
+        "title": "1. Acceptance of Terms",
+        "content": "By accessing and using µTodo, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service."
+      },
+      "section2": {
+        "title": "2. Description of Service",
+        "content": "µTodo is a task management application that allows users to create, organize, and track their daily tasks and projects. The service is provided 'as is' and may be modified or discontinued at any time."
+      },
+      "section3": {
+        "title": "3. User Accounts",
+        "content": "Users are responsible for maintaining the confidentiality of their account information and password. You agree to accept responsibility for all activities that occur under your account."
+      },
+      "section4": {
+        "title": "4. Privacy and Data Protection",
+        "content": "We respect your privacy and are committed to protecting your personal data. All data is stored securely and is not shared with third parties without your consent."
+      },
+      "section5": {
+        "title": "5. Limitation of Liability",
+        "content": "µTodo shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use the service."
+      },
+      "section6": {
+        "title": "6. Modification of Terms",
+        "content": "We reserve the right to modify these terms at any time. Users will be notified of significant changes via email or through the application."
+      },
+      "section7": {
+        "title": "7. Governing Law",
+        "content": "These terms shall be governed by and construed in accordance with the laws of France, without regard to its conflict of law provisions."
+      }
+    },
+    "cgv": {
+      "title": "Terms of Sale",
+      "lastUpdated": "Last updated",
+      "section1": {
+        "title": "1. General Information",
+        "content": "These Terms of Sale govern the purchase of premium subscriptions for µTodo. By purchasing a premium subscription, you agree to these terms."
+      },
+      "section2": {
+        "title": "2. Premium Features",
+        "content": "The premium subscription includes the following features:",
+        "item1": "Unlimited custom status columns",
+        "item2": "Priority customer support",
+        "item3": "Advanced features and integrations"
+      },
+      "section3": {
+        "title": "3. Pricing and Payment",
+        "content": "Premium subscriptions are billed monthly at €1.99 per month. All payments are processed securely through Stripe. Prices are inclusive of applicable taxes."
+      },
+      "section4": {
+        "title": "4. Subscription Management",
+        "content": "You can cancel your subscription at any time through your account settings. Cancellation will take effect at the end of your current billing period."
+      },
+      "section5": {
+        "title": "5. Refund Policy",
+        "content": "We offer a 14-day money-back guarantee for new subscribers. Refund requests must be submitted within 14 days of the initial purchase."
+      },
+      "section6": {
+        "title": "6. Service Availability",
+        "content": "We strive to maintain 99.9% uptime but cannot guarantee uninterrupted service. Scheduled maintenance will be announced in advance when possible."
+      },
+      "section7": {
+        "title": "7. Changes to Premium Features",
+        "content": "We may add, modify, or remove premium features with reasonable notice. Existing subscribers will be notified of significant changes."
+      },
+      "section8": {
+        "title": "8. Dispute Resolution",
+        "content": "Any disputes arising from premium subscriptions will be resolved through binding arbitration in accordance with French law."
+      }
     }
   }
 }
