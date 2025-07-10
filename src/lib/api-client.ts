@@ -45,16 +45,8 @@ class ApiClient {
     }
   }
 
-  private async clearAuthState() {
-    // Try to call logout endpoint, but don't fail if it doesn't work
-    try {
-      await this.post('/auth/logout');
-    } catch (error) {
-      console.warn('Server logout failed, clearing client state anyway:', error);
-      // Continue with client-side cleanup even if server logout fails
-    }
-    
-    // Clear CSRF token
+  private clearAuthState() {
+    // Clear CSRF token only - don't call logout endpoint to avoid recursion
     CSRFManager.clearToken();
   }
 
@@ -70,7 +62,7 @@ class ApiClient {
 
       if (!response.ok) {
         console.error('Token refresh failed:', response.status, response.statusText);
-        await this.clearAuthState();
+        this.clearAuthState();
         throw new Error(`Token refresh failed: ${response.status}`);
       }
 
@@ -192,7 +184,7 @@ class ApiClient {
   }
 
   public async clearTokens() {
-    await this.clearAuthState();
+    this.clearAuthState();
   }
 
   public async isAuthenticated(): Promise<boolean> {

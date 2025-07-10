@@ -46,15 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: LoginDto) => {
     setIsLoading(true);
     try {
-      const loginResponse = await authService.login(credentials);
-      // Login response might contain user data directly
-      if (loginResponse.user) {
-        setUser(loginResponse.user);
-      } else {
-        // Fallback: get profile from server
-        const profile = await authService.getProfile();
-        setUser(profile);
-      }
+      await authService.login(credentials);
+      // Always get complete profile from server after login
+      const profile = await authService.getProfile();
+      setUser(profile);
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
+    // Prevent multiple logout calls during StrictMode double-execution
+    if (isLoading) return;
+    
     setIsLoading(true);
     try {
       await authService.logout();
