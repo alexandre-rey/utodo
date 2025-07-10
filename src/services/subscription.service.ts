@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import { type SubscriptionStatus, type CreateSubscriptionDto, type CreateSubscriptionResponse, type StatusLimits } from '@/types/api';
+import { type SubscriptionStatus, type CreateSubscriptionDto, type StatusLimits } from '@/types/api';
 
 class SubscriptionService {
   public async getSubscriptionStatus(): Promise<SubscriptionStatus> {
