@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const initializeAuth = async () => {
     try {
-      if (authService.isAuthenticated()) {
+      if ((await authService.isAuthenticated())) {
         const profile = await authService.getProfile();
         setUser(profile);
       }

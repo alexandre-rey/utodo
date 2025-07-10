@@ -15,12 +15,12 @@ export default function Footer() {
             >
               {t('legal.cgu.title')}
             </Link>
-            <Link 
+          {/*  <Link 
               to="/cgv" 
               className="hover:text-slate-800 transition-colors underline"
             >
               {t('legal.cgv.title')}
-            </Link>
+            </Link>*/}
           </div>
           <div className="text-slate-500">
             © 2025 µTodo

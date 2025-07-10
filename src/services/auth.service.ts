@@ -62,8 +62,8 @@ class AuthService {
     } finally {
       await apiClient.clearTokens();
       // Reset sync flags
-      todoService.setSyncFlag(false);
-      settingsService.setSyncFlag(false);
+      todoService.resetSyncFlag();
+      settingsService.resetSyncFlag();
     }
   }
 
@@ -89,8 +89,8 @@ class AuthService {
   public async clearAuth(): Promise<void> {
     await apiClient.clearTokens();
     // Reset sync flags
-    todoService.setSyncFlag(false);
-    settingsService.setSyncFlag(false);
+    todoService.resetSyncFlag();
+    settingsService.resetSyncFlag();
   }
 }
 

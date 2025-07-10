@@ -1,7 +1,4 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
-import {  CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Star, CreditCard } from 'lucide-react';
+import { Check, Star } from 'lucide-react';
 
 // Initialize Stripe
 //const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51RhTQ1IMIipJaxZMBz2dlVyC5Fx75JRaqgk8ece6o3TQd5G8m1AIf2Ui2TRiVjp0uk4szgRPCk9zwnDfw3IF77jA00Z44lM1A6');
@@ -26,6 +23,7 @@ interface UpgradeDialogProps {
 }
 
 // Payment Form Component
+/*
 function PaymentForm({ 
   onUpgrade, 
   priceId, 
@@ -118,20 +116,21 @@ function PaymentForm({
     </form>
   );
 }
-
+*/
 export default function UpgradeDialog({ 
   isOpen, 
   onClose, 
-  onUpgrade, 
+   
   currentLimit, 
   currentUsage 
 }: UpgradeDialogProps) {
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
+ // const [isLoading, setIsLoading] = useState(false);
 
   // This would typically come from your Stripe configuration
-  const PREMIUM_PRICE_ID = 'prod_Sciw3hP4PkkysL'; // Replace with actual Stripe price ID
+  //const PREMIUM_PRICE_ID = 'prod_Sciw3hP4PkkysL'; // Replace with actual Stripe price ID
 
+  /*
   const handleUpgrade = async () => {
     setIsLoading(true);
     try {
@@ -147,7 +146,7 @@ export default function UpgradeDialog({
       setIsLoading(false);
     }
   };
-
+  */
   const features = [
     t('subscription.feature.unlimitedStatuses'),
     t('subscription.feature.prioritySupport'),

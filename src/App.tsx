@@ -118,7 +118,7 @@ export default function App() {
           isOpen={isSettingsOpen} 
           onClose={() => setIsSettingsOpen(false)}
           settings={settings}
-          setSettings={handleSettingsChange}
+          setSettings={async (newSettings) => handleSettingsChange(newSettings)}
           todos={todos}
           onTodosUpdate={(newTodos) => setTodos(newTodos)}
         />

@@ -29,6 +29,7 @@ interface MobileViewProps {
   onBulkDelete: () => void;
   onBulkStatusChange: (statusId: string) => void;
   user: User | null;
+  isLoading: boolean;
   completedCount: number;
   onOpenSettings: () => void;
   onOpenAuth: () => void;
@@ -55,6 +56,7 @@ export default function MobileView({
   onBulkDelete,
   onBulkStatusChange,
   user,
+  isLoading,
   completedCount,
   onOpenSettings,
   onOpenAuth,
@@ -141,6 +143,7 @@ export default function MobileView({
       {/* Mobile Header */}
       <MobileHeader
         user={user}
+        isLoading={isLoading}
         completedCount={completedCount}
         showCompleted={showCompleted}
         onToggleCompleted={onToggleCompleted}
