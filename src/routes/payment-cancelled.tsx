@@ -3,9 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { XCircle, ArrowLeft } from 'lucide-react'
+import { useSEO } from '@/hooks/useSEO'
 
 function PaymentCancelled() {
   const { t } = useTranslation()
+
+  // SEO setup for payment cancelled page
+  useSEO({
+    title: 'Payment Cancelled - µTodo',
+    description: 'Your payment has been cancelled. You can try again or continue using µTodo for free.',
+    type: 'article'
+  });
 
   const handleGoBack = () => {
     window.location.href = '/'

@@ -3,9 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ArrowLeft, ShoppingCart } from 'lucide-react'
+import { useSEO } from '@/hooks/useSEO'
 
 function CGV() {
   const { t } = useTranslation()
+
+  // SEO setup for CGV page
+  useSEO({
+    title: t('legal.cgv.title') + ' - µTodo',
+    description: 'Consultez les conditions générales de vente pour les services premium de µTodo.',
+    type: 'article'
+  });
 
   const handleGoBack = () => {
     window.location.href = '/'

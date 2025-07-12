@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import QuickAdd from "./components/QuickAdd";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useIsMobile } from "./hooks/useMediaQuery";
+import { useSEO } from "./hooks/useSEO";
 import SimpleMobileView from "./components/SimpleMobileView";
 import DesktopDashboard from "./components/DesktopDashboard";
 import { useTodosContext } from "./contexts/TodosContext";
@@ -19,6 +20,9 @@ import { useAuth } from "./contexts/AuthContext";
 import { useAppUIContext } from "./contexts/AppContext";
 
 export default function App() {
+  // SEO setup for the main application
+  useSEO();
+
   // Get data from contexts instead of local state
   const {
     todos,

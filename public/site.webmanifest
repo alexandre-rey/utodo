@@ -1,0 +1,84 @@
+{
+  "name": "µTodo - Simple Todo List Manager",
+  "short_name": "µTodo",
+  "description": "A simple, secure, and efficient todo list manager with kanban board and calendar views.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop view of µTodo kanban board"
+    },
+    {
+      "src": "/screenshots/mobile-narrow.png", 
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile view of µTodo todo list"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Add New Todo",
+      "short_name": "New Todo",
+      "description": "Quickly add a new todo item",
+      "url": "/?action=new",
+      "icons": [
+        {
+          "src": "/icons/add-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Calendar View",
+      "short_name": "Calendar",
+      "description": "View todos in calendar format",
+      "url": "/?view=calendar",
+      "icons": [
+        {
+          "src": "/icons/calendar-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

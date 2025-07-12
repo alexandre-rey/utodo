@@ -5,11 +5,19 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, Star } from 'lucide-react'
+import { useSEO } from '@/hooks/useSEO'
 
 function PaymentSuccess() {
   const { t } = useTranslation()
   const searchParams = new URLSearchParams(window.location.search)
   const session_id = searchParams.get('session_id')
+
+  // SEO setup for payment success page
+  useSEO({
+    title: 'Payment Successful - µTodo Premium',
+    description: 'Your payment has been processed successfully. Welcome to µTodo Premium!',
+    type: 'article'
+  });
 
   useEffect(() => {
     // Show success toast

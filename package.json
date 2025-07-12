@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run generate:sitemap",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
+    "seo:check": "echo 'Checking SEO setup...' && npm run generate:sitemap",
+    "build:prod": "npm run lint && npm run build && npm run seo:check"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.14",
