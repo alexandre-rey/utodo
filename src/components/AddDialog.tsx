@@ -6,12 +6,14 @@ import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { useTranslation } from 'react-i18next';
 import { HTMLSanitizer, InputValidator } from '@/utils/xssProtection';
+import { useComponentAnalytics } from '@/hooks/useAnalytics';
 
 interface AddDialogProps {
     onAddTodo: (values: { title: string; description: string }) => void;
 }
 
 export default function AddDialog({ onAddTodo }: AddDialogProps) {
+    useComponentAnalytics('AddDialog');
     const { t } = useTranslation();
     const [title, setTitle] = useState(t('todo.newTask'));
     const [description, setDescription] = useState("");

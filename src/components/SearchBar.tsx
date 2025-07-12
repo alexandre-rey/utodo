@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useTranslation } from 'react-i18next';
+import { useComponentAnalytics } from '@/hooks/useAnalytics';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -9,6 +10,7 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ searchQuery, setSearchQuery }: SearchBarProps) {
+  useComponentAnalytics('SearchBar', { hasQuery: !!searchQuery });
   const { t } = useTranslation();
   return (
     <div className="w-full max-w-md mb-8 px-6 relative">

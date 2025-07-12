@@ -12,16 +12,29 @@ import QuickAdd from "./components/QuickAdd";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useIsMobile } from "./hooks/useMediaQuery";
 import { useSEO } from "./hooks/useSEO";
+import { useAnalytics, useSessionAnalytics } from "./hooks/useAnalytics";
 import SimpleMobileView from "./components/SimpleMobileView";
 import DesktopDashboard from "./components/DesktopDashboard";
+import AnalyticsTest from "./components/AnalyticsTest";
 import { useTodosContext } from "./contexts/TodosContext";
 import { useSettingsContext } from "./contexts/SettingsContext";
 import { useAuth } from "./contexts/AuthContext";
 import { useAppUIContext } from "./contexts/AppContext";
+import { GoogleAnalyticsService } from "./services/analytics.service";
+import { useEffect } from "react";
 
 export default function App() {
+  // Initialize Google Analytics
+  useEffect(() => {
+    GoogleAnalyticsService.initialize();
+  }, []);
+
   // SEO setup for the main application
   useSEO();
+
+  // Analytics setup
+  const analytics = useAnalytics();
+  useSessionAnalytics();
 
   // Get data from contexts instead of local state
   const {
@@ -80,6 +93,67 @@ export default function App() {
     selectedTodosSize: selectedTodos.size
   });
 
+  // Wrap functions with analytics tracking
+  const handleAddTodoWithAnalytics = (values: any) => {
+    const result = handleAddTodo(values, settings);
+    analytics.trackTodoAction('todo_created', {
+      hasDueDate: !!values.dueDate,
+      hasDescription: !!values.description,
+      status: values.status || 'pending'
+    });
+    return result;
+  };
+
+  const deleteTodoWithAnalytics = (id: string) => {
+    const todo = todos.find(t => t.id === id);
+    deleteTodo(id);
+    analytics.trackTodoAction('todo_deleted', {
+      todoId: id,
+      status: todo?.status,
+      hasDueDate: !!todo?.dueDate
+    });
+  };
+
+  const saveTodoWithAnalytics = (updatedTodo: any) => {
+    saveTodo(updatedTodo);
+    analytics.trackTodoAction('todo_updated', {
+      todoId: updatedTodo.id,
+      status: updatedTodo.status,
+      hasDueDate: !!updatedTodo.dueDate
+    });
+  };
+
+  const handleSearchWithAnalytics = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      const resultsCount = todos.filter(todo => 
+        todo.title.toLowerCase().includes(query.toLowerCase()) ||
+        todo.description?.toLowerCase().includes(query.toLowerCase())
+      ).length;
+      analytics.trackSearch(query, resultsCount);
+    }
+  };
+
+  const handleViewModeChange = (newViewMode: any) => {
+    setViewMode(newViewMode);
+    analytics.trackUsageAction('view_mode_changed', {
+      viewMode: newViewMode,
+      todosCount: todos.length
+    });
+  };
+
+  // Track user authentication
+  useEffect(() => {
+    if (user) {
+      analytics.setUserId(user.id);
+      analytics.setUserProperties({
+        user_type: 'authenticated',
+        has_premium: false // Update based on actual subscription status
+      });
+      analytics.trackAuthAction('user_authenticated');
+    }
+  }, [user, analytics]);
+
   return (
     <>
       <Toaster />
@@ -88,7 +162,7 @@ export default function App() {
           <>
             <AppHeader
               viewMode={viewMode}
-              setViewMode={setViewMode}
+              setViewMode={handleViewModeChange}
               showCompleted={showCompleted}
               setShowCompleted={setShowCompleted}
               completedCount={completedCount}
@@ -101,10 +175,10 @@ export default function App() {
             
             <SearchBar 
               searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
+              setSearchQuery={handleSearchWithAnalytics}
             />
             
-            <QuickAdd onAddTodo={(values) => handleAddTodo(values, settings)} />
+            <QuickAdd onAddTodo={(values) => handleAddTodoWithAnalytics(values)} />
             
             <DesktopDashboard />
           </>
@@ -113,8 +187,8 @@ export default function App() {
         <OpenDialog 
           todo={selectedTodo} 
           closeDialog={handleCloseDialog} 
-          deleteTodo={deleteTodo}
-          saveTodo={saveTodo}
+          deleteTodo={deleteTodoWithAnalytics}
+          saveTodo={saveTodoWithAnalytics}
           statuses={settings.statuses}
         />
         
@@ -148,6 +222,9 @@ export default function App() {
         )}
         
         {!isMobile && <Footer />}
+        
+        {/* Analytics Test Panel - Development Only */}
+        <AnalyticsTest isVisible={import.meta.env.VITE_GA_DEBUG_MODE === 'true'} />
       </div>
     </>
   )

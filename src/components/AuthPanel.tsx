@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { sanitizeInput, sanitizeEmail, validatePassword } from "@/utils/sanitize";
 import { useTranslation } from 'react-i18next';
+import { useAnalytics, useComponentAnalytics } from '@/hooks/useAnalytics';
 
 interface AuthPanelProps {
     isOpen: boolean;
@@ -15,6 +16,8 @@ interface AuthPanelProps {
 }
 
 export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
+    useComponentAnalytics('AuthPanel', { isOpen });
+    const analytics = useAnalytics();
     const { t } = useTranslation();
     const [isSignIn, setIsSignIn] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +47,7 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     password: validatedPassword
                 });
                 toast.success(t('auth.signinSuccess'));
+                analytics.trackAuthAction('sign_in_success', { method: 'email' });
             } else {
                 // Sign Up - validate passwords match
                 if (formData.password !== formData.confirmPassword) {
@@ -58,6 +62,7 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                     lastName: sanitizedLastName
                 });
                 toast.success(t('auth.accountCreated'));
+                analytics.trackAuthAction('sign_up_success', { method: 'email' });
             }
             
             resetForm();
@@ -65,6 +70,11 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
         } catch (error: unknown) {
             const message = error instanceof Error ? error.message : t('auth.authFailed');
             toast.error(message);
+            analytics.trackAuthAction('auth_failed', { 
+                method: 'email', 
+                type: isSignIn ? 'sign_in' : 'sign_up',
+                error: message 
+            });
         }
     };
 
@@ -84,8 +94,14 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
     };
 
     const switchMode = () => {
-        setIsSignIn(!isSignIn);
+        const newMode = !isSignIn;
+        setIsSignIn(newMode);
         resetForm();
+        
+        // Track mode switch
+        analytics.trackUsageAction('auth_mode_switch', {
+          mode: newMode ? 'sign_in' : 'sign_up'
+        });
     };
 
     return (

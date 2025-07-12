@@ -12,6 +12,7 @@ import UpgradeDialog from "./UpgradeDialog";
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { isPremiumFeaturesEnabled } from '../utils/env';
+import { useComponentAnalytics, useAnalytics } from '@/hooks/useAnalytics';
 
 interface SettingsPanelProps {
     isOpen: boolean;
@@ -23,6 +24,8 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ isOpen, onClose, settings, setSettings, todos, onTodosUpdate }: SettingsPanelProps) {
+    useComponentAnalytics('SettingsPanel', { isOpen, statusCount: settings.statuses.length });
+    const analytics = useAnalytics();
     const { t } = useTranslation();
     const [editingStatus, setEditingStatus] = useState<string | null>(null);
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
@@ -32,6 +35,9 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
     // Wrapper function that updates settings
     const updateSettingsAndRefresh = async (newSettings: AppSettings) => {
         await setSettings(newSettings);
+        analytics.trackUsageAction('settings_updated', {
+            statusCount: newSettings.statuses.length
+        });
     };
 
     const updateStatus = async (id: string, updates: Partial<StatusConfig>) => {
@@ -39,6 +45,10 @@ export default function SettingsPanel({ isOpen, onClose, settings, setSettings, 
             status.id === id ? { ...status, ...updates } : status
         );
         await updateSettingsAndRefresh({ statuses: newStatuses });
+        analytics.trackUsageAction('status_updated', {
+            statusId: id,
+            updatedFields: Object.keys(updates)
+        });
     };
 
     const addStatus = async () => {
