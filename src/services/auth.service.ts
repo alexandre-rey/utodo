@@ -4,6 +4,7 @@ import { todoService } from './todo.service';
 import { settingsService } from './settings.service';
 import { SecurityMiddleware } from '@/middleware/securityMiddleware';
 import { CSRFManager } from '@/utils/csrfManager';
+import { CookieAuth } from '@/utils/cookieAuth';
 
 class AuthService {
   public async login(credentials: LoginDto): Promise<AuthResponse> {
@@ -88,9 +89,19 @@ class AuthService {
 
   public async clearAuth(): Promise<void> {
     await apiClient.clearTokens();
+    
+    // Clear authentication cookies and localStorage tokens
+    CookieAuth.clearAuth();
+    
     // Reset sync flags
     todoService.resetSyncFlag();
     settingsService.resetSyncFlag();
+    
+    // Clear local todos to prevent showing stale server data
+    todoService.clearLocalTodos();
+    
+    // Keep user settings but reset sync flag so they can be synced again
+    // when the user re-authenticates (don't clear 'userSettings' key)
   }
 }
 

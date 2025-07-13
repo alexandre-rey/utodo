@@ -17,7 +17,7 @@ class TodoService {
   private hasSynced = false;
 
   public async getTodos(params?: TodoQueryParams): Promise<TodosResponse> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.getLocalTodos(params);
     }
 
@@ -29,8 +29,19 @@ class TodoService {
     }
   }
 
+  public async getTodosFromServer(params?: TodoQueryParams): Promise<TodosResponse> {
+    // Force server call regardless of auth check - used when we know user is authenticated
+    try {
+      return await apiClient.get<TodosResponse>('/todos', params as Record<string, unknown>);
+    } catch (error) {
+      console.error('Failed to load todos from server:', error);
+      // Don't fall back to local storage - if this fails, we want to know
+      throw error;
+    }
+  }
+
   public async getTodo(id: string): Promise<Todo> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       const todos = this.getLocalTodosData();
       const todo = todos.find(t => t.id === id);
       if (!todo) {
@@ -43,7 +54,7 @@ class TodoService {
   }
 
   public async createTodo(data: CreateTodoDto): Promise<Todo> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.createLocalTodo(data);
     }
 
@@ -55,8 +66,13 @@ class TodoService {
     }
   }
 
+  public async createTodoOnServer(data: CreateTodoDto): Promise<Todo> {
+    // Force server call - used when we know user is authenticated
+    return await apiClient.post<Todo>('/todos', data);
+  }
+
   public async updateTodo(id: string, data: UpdateTodoDto): Promise<Todo> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.updateLocalTodo(id, data);
     }
 
@@ -68,8 +84,13 @@ class TodoService {
     }
   }
 
+  public async updateTodoOnServer(id: string, data: UpdateTodoDto): Promise<Todo> {
+    // Force server call - used when we know user is authenticated
+    return await apiClient.patch<Todo>(`/todos/${id}`, data);
+  }
+
   public async deleteTodo(id: string): Promise<void> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       this.deleteLocalTodo(id);
       return;
     }
@@ -82,8 +103,13 @@ class TodoService {
     }
   }
 
+  public async deleteTodoOnServer(id: string): Promise<void> {
+    // Force server call - used when we know user is authenticated
+    await apiClient.delete<MessageResponse>(`/todos/${id}`);
+  }
+
   public async bulkAction(data: BulkActionDto): Promise<BulkActionResponse> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.bulkActionLocal(data);
     }
 
@@ -219,7 +245,7 @@ class TodoService {
 
   public async syncLocalTodosToServer(): Promise<void> {
     
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return;
     }
 
@@ -276,6 +302,10 @@ class TodoService {
   public async forceSyncToServer(): Promise<void> {
     this.resetSyncFlag();
     await this.syncLocalTodosToServer();
+  }
+
+  public clearLocalTodos(): void {
+    saveToStorage(this.STORAGE_KEY, []);
   }
 }
 

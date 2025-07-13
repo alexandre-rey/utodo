@@ -188,7 +188,7 @@ class ApiClient {
   }
 
   public async isAuthenticated(): Promise<boolean> {
-    // Check if there are cookies that might contain tokens
+    // Quick check: if there are no cookies that might contain tokens, return false immediately
     if (!document.cookie || !document.cookie.includes('access_token')) {
       return false;
     }
@@ -200,6 +200,11 @@ class ApiClient {
     } catch {
       return false;
     }
+  }
+
+  public isAuthenticatedSync(): boolean {
+    // Synchronous check for auth cookies (may not be accurate for expired tokens)
+    return !!(document.cookie && document.cookie.includes('access_token'));
   }
 }
 

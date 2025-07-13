@@ -23,7 +23,7 @@ class SettingsService {
   private hasSynced = false;
 
   public async getSettings(): Promise<UserSettings> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.getLocalSettings();
     }
 
@@ -35,8 +35,13 @@ class SettingsService {
     }
   }
 
+  public async getSettingsFromServer(): Promise<UserSettings> {
+    // Force server call - used when we know user is authenticated
+    return await apiClient.get<UserSettings>('/settings');
+  }
+
   public async updateSettings(data: UpdateSettingsDto): Promise<UserSettings> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.updateLocalSettings(data);
     }
 
@@ -54,15 +59,25 @@ class SettingsService {
       
       // Don't fall back to local storage for permission errors
       if (typeof error === 'object' && error !== null && 'statusCode' in error && (error as ApiError).statusCode === 403) {
-        throw new Error('You do not have permission to modify settings');
+        throw new Error('You do not have permission to update settings');
       }
       
       return this.updateLocalSettings(data);
     }
   }
 
+  public async updateSettingsOnServer(data: UpdateSettingsDto): Promise<UserSettings> {
+    // Force server call - used when we know user is authenticated
+    // Check status limits if we're adding custom statuses
+    if (data.customStatuses) {
+      await this.validateStatusLimits(data.customStatuses);
+    }
+
+    return await apiClient.patch<UserSettings>('/settings', data);
+  }
+
   public async resetToDefaults(): Promise<UserSettings> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return this.resetLocalSettings();
     }
 
@@ -80,6 +95,11 @@ class SettingsService {
       
       return this.resetLocalSettings();
     }
+  }
+
+  public async resetToDefaultsOnServer(): Promise<UserSettings> {
+    // Force server call - used when we know user is authenticated
+    return await apiClient.post<UserSettings>('/settings/reset');
   }
 
   private getLocalSettings(): UserSettings {
@@ -108,7 +128,7 @@ class SettingsService {
   }
 
   public async syncLocalSettingsToServer(): Promise<void> {
-    if (!apiClient.isAuthenticated()) {
+    if (!(await apiClient.isAuthenticated())) {
       return;
     }
 
@@ -166,7 +186,7 @@ class SettingsService {
     }
 
     // Only do server-side validation if premium features are enabled and user is authenticated
-    if (!isPremiumFeaturesEnabled() || !apiClient.isAuthenticated()) {
+    if (!isPremiumFeaturesEnabled() || !(await apiClient.isAuthenticated())) {
       return;
     }
 

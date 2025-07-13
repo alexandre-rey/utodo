@@ -49,11 +49,27 @@ export function useSettings() {
 
   const loadSettings = async () => {
     try {
-      const userSettings = await settingsService.getSettings();
+      // Use appropriate method based on auth state
+      const getSettingsMethod = isAuthenticated ? 
+        settingsService.getSettingsFromServer.bind(settingsService) : 
+        settingsService.getSettings.bind(settingsService);
+        
+      const userSettings = await getSettingsMethod();
       const appSettings = transformToAppSettings(userSettings);
       setSettings(appSettings);
     } catch (error) {
       console.error('Failed to load settings:', error);
+      // If loading fails and user should be authenticated, keep default settings
+      if (isAuthenticated) {
+        // Reset to default settings when server load fails
+        setSettings({
+          statuses: [
+            { id: "pending", label: "Pending", color: "#6b7280" },
+            { id: "inProgress", label: "In Progress", color: "#3b82f6" },
+            { id: "done", label: "Done", color: "#10b981" }
+          ]
+        });
+      }
     }
   };
 
@@ -67,7 +83,13 @@ export function useSettings() {
   const handleSettingsChange = async (newSettings: AppSettings) => {
     try {
       const userSettingsUpdate = transformToUserSettings(newSettings);
-      await settingsService.updateSettings(userSettingsUpdate);
+      
+      // Use appropriate method based on auth state
+      const updateMethod = isAuthenticated ? 
+        settingsService.updateSettingsOnServer.bind(settingsService) : 
+        settingsService.updateSettings.bind(settingsService);
+        
+      await updateMethod(userSettingsUpdate);
       setSettings(newSettings);
     } catch (error: unknown) {
       console.error('Failed to update settings:', error);

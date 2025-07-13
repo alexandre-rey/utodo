@@ -10,8 +10,13 @@ export function useTodos() {
 
   const loadTodos = async () => {
     try {
+      // Use appropriate method based on auth state
+      const getTodosMethod = isAuthenticated ? 
+        todoService.getTodosFromServer.bind(todoService) : 
+        todoService.getTodos.bind(todoService);
+      
       // First, get the first page to know the total count
-      const firstPage = await todoService.getTodos({ page: 1, limit: 100 });
+      const firstPage = await getTodosMethod({ page: 1, limit: 100 });
       
       let allTodos = [...firstPage.data];
       
@@ -19,7 +24,7 @@ export function useTodos() {
       if (firstPage.meta.totalPages > 1) {
         const remainingPages = [];
         for (let page = 2; page <= firstPage.meta.totalPages; page++) {
-          remainingPages.push(todoService.getTodos({ page, limit: 100 }));
+          remainingPages.push(getTodosMethod({ page, limit: 100 }));
         }
         
         const remainingResponses = await Promise.all(remainingPages);
@@ -38,6 +43,10 @@ export function useTodos() {
       setTodos(transformedTodos);
     } catch (error) {
       console.error('Failed to load todos:', error);
+      // If loading fails and user should be authenticated, clear todos to prevent stale data
+      if (isAuthenticated) {
+        setTodos([]);
+      }
     }
   };
 
@@ -45,14 +54,23 @@ export function useTodos() {
     // Don't load todos while auth is still loading
     if (isLoading) return;
     
-    loadTodos();
+    if (isAuthenticated) {
+      loadTodos();
+    } else {
+      // Clear todos when user is not authenticated
+      setTodos([]);
+    }
   }, [isAuthenticated, isLoading]); // Reload when auth state changes
 
   const handleAddTodo = async (values: { title: string, description: string }, settings?: AppSettings) => {
     const defaultStatus = settings?.statuses[0]?.id || "pending";
     
     try {
-      const apiTodo = await todoService.createTodo({
+      const createMethod = isAuthenticated ? 
+        todoService.createTodoOnServer.bind(todoService) : 
+        todoService.createTodo.bind(todoService);
+        
+      const apiTodo = await createMethod({
         title: values.title,
         description: values.description,
         status: defaultStatus
@@ -74,7 +92,11 @@ export function useTodos() {
 
   const deleteTodo = async (id: string) => {
     try {
-      await todoService.deleteTodo(id);
+      const deleteMethod = isAuthenticated ? 
+        todoService.deleteTodoOnServer.bind(todoService) : 
+        todoService.deleteTodo.bind(todoService);
+        
+      await deleteMethod(id);
       setTodos(prev => prev.filter(todo => todo.id !== id));
     } catch (error) {
       console.error('Failed to delete todo:', error);
@@ -92,7 +114,11 @@ export function useTodos() {
         isCompleted: todo.completed
       };
       
-      const apiTodo = await todoService.updateTodo(todo.id, updateData);
+      const updateMethod = isAuthenticated ? 
+        todoService.updateTodoOnServer.bind(todoService) : 
+        todoService.updateTodo.bind(todoService);
+      
+      const apiTodo = await updateMethod(todo.id, updateData);
       
       const updatedTodo: Todo = {
         ...apiTodo,

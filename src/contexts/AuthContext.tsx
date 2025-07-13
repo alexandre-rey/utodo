@@ -31,10 +31,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           // No cookies, user is not authenticated
           setUser(null);
+          // Clear any stale auth state
+          await authService.clearAuth();
         }
       } catch {
         // If profile request fails, user is not authenticated
         setUser(null);
+        // Clear any stale auth state and local data
+        await authService.clearAuth();
       } finally {
         setIsLoading(false);
       }
@@ -73,12 +77,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       await authService.logout();
-      setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
-      // Still clear user state even if server logout fails
-      setUser(null);
+      // Still proceed with local cleanup even if server logout fails
     } finally {
+      // Always clear user state and local data
+      setUser(null);
       setIsLoading(false);
     }
   };
