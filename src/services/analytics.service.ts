@@ -34,6 +34,13 @@ export class GoogleAnalyticsService {
     const debugMode = import.meta.env.VITE_GA_DEBUG_MODE === 'true';
     const environment = import.meta.env.VITE_ENV;
 
+    // Temporary debug to verify correct ID
+    console.log('🔍 GA Init Check:', {
+      measurementId,
+      expected: 'G-6WYY1F8EMK',
+      match: measurementId === 'G-6WYY1F8EMK'
+    });
+
     if (!measurementId || measurementId === 'G-XXXXXXXXXX') {
       console.warn('Google Analytics: Measurement ID not configured');
       return;
