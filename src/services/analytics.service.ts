@@ -34,11 +34,6 @@ export class GoogleAnalyticsService {
     const debugMode = import.meta.env.VITE_GA_DEBUG_MODE === 'true';
     const environment = import.meta.env.VITE_ENV;
 
-    console.log('🔧 GA Initialization Debug:');
-    console.log('  - Measurement ID:', measurementId);
-    console.log('  - Debug Mode:', debugMode);
-    console.log('  - Environment:', environment);
-
     if (!measurementId || measurementId === 'G-XXXXXXXXXX') {
       console.warn('Google Analytics: Measurement ID not configured');
       return;
@@ -46,19 +41,12 @@ export class GoogleAnalyticsService {
 
     // Don't initialize in development unless explicitly enabled
     if (environment === 'development' && !debugMode) {
-      console.log('Google Analytics: Disabled in development mode');
       return;
     }
 
     try {
-      const testModeValue = environment === 'development' && debugMode;
-      console.log('🎯 GA Configuration:');
-      console.log('  - Test Mode (blocks real data):', testModeValue);
-      console.log('  - Debug Mode (console logs):', debugMode);
-      
       ReactGA.initialize(measurementId, {
-        // Only use testMode in actual development/testing, not for debug logging
-        testMode: testModeValue,
+        testMode: environment === 'development',
         gtagOptions: {
           debug_mode: debugMode,
           send_page_view: false, // We'll handle page views manually
@@ -68,15 +56,6 @@ export class GoogleAnalyticsService {
       this.isInitialized = true;
       this.measurementId = measurementId;
       this.debugMode = debugMode;
-
-      console.log('✅ Google Analytics initialized successfully');
-      
-      if (debugMode) {
-        console.log('📊 GA Debug Info:');
-        console.log('  - Measurement ID:', measurementId);
-        console.log('  - Will send real data:', !testModeValue);
-        console.log('  - Console logging enabled:', debugMode);
-      }
 
       // Set default parameters
       ReactGA.gtag('config', measurementId, {

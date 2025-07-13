@@ -15,7 +15,6 @@ import { useSEO } from "./hooks/useSEO";
 import { useAnalytics, useSessionAnalytics } from "./hooks/useAnalytics";
 import SimpleMobileView from "./components/SimpleMobileView";
 import DesktopDashboard from "./components/DesktopDashboard";
-import AnalyticsTest from "./components/AnalyticsTest";
 import { useTodosContext } from "./contexts/TodosContext";
 import { useSettingsContext } from "./contexts/SettingsContext";
 import { useAuth } from "./contexts/AuthContext";
@@ -222,9 +221,6 @@ export default function App() {
         )}
         
         {!isMobile && <Footer />}
-        
-        {/* Analytics Test Panel - Development Only */}
-        <AnalyticsTest isVisible={import.meta.env.VITE_GA_DEBUG_MODE === 'true'} />
       </div>
     </>
   )
