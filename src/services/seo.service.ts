@@ -110,19 +110,28 @@ export class SEOService {
 
   /**
    * Generate structured data for current page
+   * Note: Due to CSP restrictions, structured data is now handled statically in index.html
+   * This method logs the data for debugging purposes
    */
   static updateStructuredData(data: any): void {
-    // Remove existing structured data
-    const existingScript = document.querySelector('script[type="application/ld+json"]');
-    if (existingScript) {
-      existingScript.remove();
+    // Log structured data for debugging (since dynamic injection is restricted by CSP)
+    console.log('SEO Structured Data (static version in index.html):', JSON.stringify(data, null, 2));
+    
+    // For production, structured data should be pre-rendered or handled server-side
+    // The base structured data is now included directly in index.html
+    
+    // Optional: Store in meta tag for potential server-side rendering
+    try {
+      const metaTag = document.querySelector('meta[name="structured-data"]') || document.createElement('meta');
+      metaTag.setAttribute('name', 'structured-data');
+      metaTag.setAttribute('content', JSON.stringify(data));
+      
+      if (!document.querySelector('meta[name="structured-data"]')) {
+        document.head.appendChild(metaTag);
+      }
+    } catch (error) {
+      console.warn('Could not store structured data in meta tag:', error);
     }
-
-    // Add new structured data
-    const script = document.createElement('script');
-    script.setAttribute('type', 'application/ld+json');
-    script.textContent = JSON.stringify(data);
-    document.head.appendChild(script);
   }
 
   /**
