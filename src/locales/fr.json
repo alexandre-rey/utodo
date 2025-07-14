@@ -28,6 +28,7 @@
     "enterEmail": "Entrez votre email",
     "enterPassword": "Entrez votre mot de passe",
     "confirmYourPassword": "Confirmez votre mot de passe",
+    "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères, incluant majuscule, minuscule, chiffre et caractère spécial",
     "pleaseWait": "Veuillez patienter...",
     "noAccount": "Vous n'avez pas de compte ?",
     "hasAccount": "Vous avez déjà un compte ?",
@@ -194,10 +195,8 @@
       "dataBackup": "Sauvegarde automatique des données"
     },
     "completePayment": "Finaliser le paiement",
-    "paymentFailed": "Échec du paiement",
     "paymentSuccess": "Paiement réussi",
     "payNow": "Payer maintenant",
-    "upgradeSuccess": "Mise à niveau réussie",
     "paymentCancelled": "Paiement annulé",
     "paymentSuccessMessage": "Votre paiement a été traité avec succès ! Vous avez maintenant accès aux fonctionnalités premium.",
     "paymentCancelledMessage": "Votre paiement a été annulé. Aucun frais n'a été appliqué à votre compte.",

@@ -199,6 +199,11 @@ export default function AuthPanel({ isOpen, onClose }: AuthPanelProps) {
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
                         </div>
+                        {!isSignIn && (
+                            <p className="text-xs text-slate-500 mt-1">
+                                {t('auth.passwordRequirements')}
+                            </p>
+                        )}
                     </div>
 
                     {/* Confirm Password field - only for sign up */}

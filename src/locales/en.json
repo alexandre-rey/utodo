@@ -32,6 +32,7 @@
     "enterEmail": "Enter your email",
     "enterPassword": "Enter your password",
     "confirmYourPassword": "Confirm your password",
+    "passwordRequirements": "Password must contain at least 8 characters, including uppercase, lowercase, number, and special character",
     "pleaseWait": "Please wait...",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
@@ -194,10 +195,8 @@
       "dataBackup": "Automatic data backup"
     },
     "completePayment": "Complete Payment",
-    "paymentFailed": "Payment Failed",
     "paymentSuccess": "Payment Successful",
     "payNow": "Pay Now",
-    "upgradeSuccess": "Upgrade Successful",
     "paymentCancelled": "Payment Cancelled",
     "paymentSuccessMessage": "Your payment was processed successfully! You now have access to premium features.",
     "paymentCancelledMessage": "Your payment was cancelled. No charges were applied to your account.",
